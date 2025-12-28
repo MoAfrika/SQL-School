@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sql School</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --------------------------------------------------
+           CORE VARIABLES
+        -------------------------------------------------- */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-subtle: #e0e7ff;
+            
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --playful-gradient: linear-gradient(135deg, #f472b6 0%, #9333ea 100%);
+            
+            --accent-glow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            --success-glow: 0 4px 20px rgba(16, 185, 129, 0.4);
+
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --surface-hover: #f1f5f9;
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --border-color: #e2e8f0;
+            
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+
+            --editor-bg: #1e1e2e;
+            --editor-text: #a6accd;
+            
+            --sa-top: env(safe-area-inset-top);
+            --sa-bottom: env(safe-area-inset-bottom);
+            --sa-left: env(safe-area-inset-left);
+            --sa-right: env(safe-area-inset-right);
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --------------------------------------------------
+           LAYOUT & ANIMATIONS
+        -------------------------------------------------- */
+        .app-container { display: flex; height: 100%; position: relative; width: 100vw; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .sidebar-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);
+            z-index: 1040; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-backdrop.active { opacity: 1; pointer-events: auto; }
+
+        .sidebar {
+            width: 280px; background-color: var(--bg-card); border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column; flex-shrink: 0; 
+            position: fixed; left: -280px; top: 0; height: 100%; z-index: 1050;
+            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: var(--shadow-lg);
+            padding-top: var(--sa-top); padding-bottom: var(--sa-bottom); padding-left: var(--sa-left);
+        }
+        .sidebar.active { transform: translateX(280px); }
+
+        @media (min-width: 992px) {
+            .sidebar { position: relative; left: 0; transform: none; box-shadow: none; z-index: 1; }
+            .sidebar-backdrop { display: none; }
+        }
+
+        .main-content { 
+            flex: 1; display: flex; flex-direction: column; 
+            background-color: var(--bg-main); width: 100%; overflow: hidden;
+            padding-right: var(--sa-right);
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color); 
+            padding: 0.75rem 1.25rem; padding-top: calc(0.75rem + var(--sa-top));
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+
+        /* --------------------------------------------------
+           COMPONENTS
+        -------------------------------------------------- */
+        .brand-logo {
+            font-weight: 800; font-size: 1.4rem;
+            background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+        .brand-icon { color: var(--primary-color); -webkit-text-fill-color: var(--primary-color); }
+
+        .level-accordion .accordion-item { background: transparent; border: none; border-bottom: 1px solid var(--border-color); }
+        .level-accordion .accordion-button { background: transparent; color: var(--text-main); font-weight: 700; box-shadow: none; padding: 1.1rem; }
+        .level-accordion .accordion-button:not(.collapsed) { color: var(--primary-color); background: var(--primary-subtle); }
+
+        .lesson-item {
+            padding: 12px 15px 12px 35px; cursor: pointer; color: var(--text-muted); font-size: 0.95rem;
+            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+            border-left: 3px solid transparent; font-weight: 500;
+        }
+        .lesson-item:hover { color: var(--primary-color); background-color: var(--surface-hover); }
+        .lesson-item.active {
+            color: var(--primary-dark); background-color: rgba(99, 102, 241, 0.08);
+            border-left-color: var(--primary-color); font-weight: 600;
+        }
+        .lesson-item.completed i { color: var(--success-color); }
+
+        /* --------------------------------------------------
+           EDITOR & WORKSPACE
+        -------------------------------------------------- */
+        .workspace-container { display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
+        @media (min-width: 992px) {
+            .workspace-container { overflow: hidden; }
+            .editor-area { flex: 1; overflow: hidden; }
+        }
+
+        .lesson-instructions {
+            background-color: #fff; border-bottom: 1px solid var(--border-color); padding: 1.5rem;
+            overflow-y: auto; flex-shrink: 0; font-size: 1rem; line-height: 1.6;
+        }
+        @media (max-height: 500px) { .lesson-instructions { max-height: 150px; padding: 1rem; } }
+        @media (min-width: 992px) { .lesson-instructions { max-height: 45vh; padding: 2rem; } }
+
+        .editor-area { display: flex; flex-direction: column; gap: 1rem; padding: 1rem; height: 100%; }
+        @media (max-width: 576px) { .editor-area { padding: 0.75rem; gap: 0.75rem; } }
+
+        .code-editor-container {
+            background-color: var(--editor-bg); border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column; min-height: 180px;
+            box-shadow: var(--shadow-md); border: 1px solid #334155;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .code-editor-container:focus-within { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        .code-editor-container.success-glow {
+            border-color: var(--success-color) !important;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25) !important;
+        }
+
+        .editor-header {
+            background-color: #161622; padding: 8px 16px; color: #7b8097; font-size: 0.75rem;
+            text-transform: uppercase; font-weight: 700; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 40px;
+        }
+
+        textarea#sql-editor {
+            flex: 1; width: 100%; background: transparent; color: var(--editor-text);
+            border: none; padding: 16px; font-family: var(--font-code); font-size: 16px;
+            line-height: 1.5; resize: none; outline: none;
+        }
+
+        .results-area {
+            flex: 1; background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+            min-height: 250px; box-shadow: var(--shadow-sm); position: relative;
+        }
+
+        .results-header {
+            padding: 10px 16px; background-color: var(--surface-hover); border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; white-space: nowrap; }
+        .table-custom th {
+            background-color: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase;
+            font-size: 0.75rem; letter-spacing: 0.5px; padding: 12px 16px; text-align: left;
+            position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 2;
+        }
+        .table-custom td { border-bottom: 1px solid var(--border-color); padding: 12px 16px; color: var(--text-main); }
+        .table-custom tr:last-child td { border-bottom: none; }
+        .table-custom tr:hover td { background-color: var(--surface-hover); }
+
+        /* --------------------------------------------------
+           CHARTS & VISUALIZATION
+        -------------------------------------------------- */
+        .chart-container {
+            padding: 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            min-height: 200px;
+            gap: 10px;
+        }
+        .chart-bar-wrapper {
+            flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; max-width: 60px;
+        }
+        .chart-bar {
+            width: 100%; background: var(--accent-gradient); border-radius: 6px 6px 0 0;
+            transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1); position: relative; min-height: 4px;
+        }
+        .chart-bar:hover { opacity: 0.9; transform: scaleX(1.1); }
+        .chart-label { margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .chart-value { margin-bottom: 6px; font-size: 0.75rem; font-weight: 700; color: var(--primary-color); }
+
+        /* --------------------------------------------------
+           LANDING PAGE SPECIFIC
+        -------------------------------------------------- */
+        .landing-container {
+            position: relative; height: 100%; width: 100%; overflow: hidden;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+        }
+        /* Animated Blobs */
+        .landing-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: blobFloat 15s infinite alternate; }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #818cf8; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #34d399; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #f472b6; animation-delay: -8s; }
+        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, -30px) scale(1.1); } }
+
+        /* Hero Card */
+        .hero-card {
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px; padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05); max-width: 600px; width: 90%; position: relative; z-index: 2;
+            text-align: center;
+        }
+
+        /* Floating Code Particles */
+        .code-floater {
+            position: absolute; font-family: var(--font-code); color: rgba(15, 23, 42, 0.08);
+            font-weight: 800; font-size: 2rem; user-select: none; z-index: 1; pointer-events: none;
+            animation: floatText 20s linear infinite;
+        }
+        @keyframes floatText { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-20vh) rotate(20deg); opacity: 0; } }
+
+        /* Pulse Button */
+        .btn-pulse {
+            background: var(--accent-gradient); color: white; border: none;
+            padding: 1rem 3rem; border-radius: 50px; font-weight: 700; font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: transform 0.2s;
+            animation: pulseBtn 2s infinite; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-pulse:hover { transform: scale(1.05); color: white; text-decoration: none; }
+        @keyframes pulseBtn { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
+
+        /* --------------------------------------------------
+           BUTTONS & UTILITIES
+        -------------------------------------------------- */
+        .btn-run {
+            background: var(--accent-gradient); color: white; border: none; padding: 0.6rem 1.5rem;
+            border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--accent-glow);
+        }
+        .btn-run:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6); color: white; }
+        .btn-run:active { transform: translateY(0); }
+
+        .btn-success-custom {
+            background: var(--success-gradient); color: white; border: none; padding: 0.6rem 1.5rem;
+            border-radius: 10px; font-weight: 600; font-size: 0.95rem;
+            box-shadow: var(--success-glow); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-success-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); color: white; }
+
+        .btn-ai-magic {
+            background: rgba(255,255,255,0.1); color: var(--primary-light); border: 1px solid rgba(255,255,255,0.2);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        }
+        .btn-ai-magic:hover { background: rgba(255,255,255,0.2); color: white; transform: translateY(-1px); }
+
+        .btn-outline-custom {
+            border: 1px solid var(--border-color); color: var(--text-muted); background: white;
+            border-radius: 10px; font-weight: 500; transition: all 0.2s;
+        }
+        .btn-outline-custom:hover { border-color: var(--primary-color); color: var(--primary-color); background: var(--surface-hover); }
+
+        .badge-xp {
+            background: var(--success-gradient); color: white; padding: 0.35rem 0.85rem;
+            border-radius: 20px; font-weight: 700; font-size: 0.8rem; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-msg {
+            padding: 16px; border-radius: 12px; margin-top: 16px; display: none; font-size: 0.95rem;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: var(--shadow-sm);
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .status-success { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; }
+        .status-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .cheat-card {
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: white;
+            height: 100%; transition: transform 0.2s;
+        }
+        .cheat-card:hover { transform: translateY(-3px); border-color: var(--primary-light); box-shadow: var(--shadow-md); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* AI Markdown */
+        .markdown-body { font-size: 0.95rem; line-height: 1.6; color: var(--text-main); }
+        .markdown-body code { background: #f1f5f9; color: var(--primary-dark); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; }
+        .markdown-body pre { background: #1e1e2e; color: #a6accd; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+        .markdown-body pre code { background: transparent; color: inherit; padding: 0; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="app.toggleSidebar(false)"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="p-4 d-flex justify-content-between align-items-center">
+            <a href="#" class="brand-logo" onclick="app.renderLanding()">
+                <i class="fas fa-graduation-cap brand-icon"></i> Sql School
+            </a>
+            <button class="btn btn-sm btn-link text-muted d-lg-none p-2" onclick="app.toggleSidebar(false)" aria-label="Close Menu">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+        </div>
+        
+        <div class="overflow-auto flex-grow-1">
+            <div class="px-3 pb-3">
+                <button class="btn btn-outline-custom w-100 mb-2 py-2 text-start" onclick="app.loadLesson('playground')">
+                    <i class="fas fa-code me-2 text-warning"></i>Free Playground
+                </button>
+            </div>
+            <div class="accordion level-accordion" id="curriculumAccordion">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <div class="mt-auto p-4 bg-white border-top border-light">
+            <button class="btn btn-outline-custom w-100 mb-3 fw-bold py-2" onclick="app.generateChallenge()" style="color: var(--primary-dark); border-color: var(--primary-subtle);">
+                <i class="fas fa-bullseye me-2"></i> AI Challenge Mode
+            </button>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <small class="text-uppercase fw-bold text-light" style="font-size: 0.7rem; letter-spacing: 1px;">XP Progress</small>
+                <span class="badge-xp" id="total-xp">0 XP</span>
+            </div>
+            <div class="progress" style="height: 8px; background-color: #f1f5f9; border-radius: 4px;">
+                <div class="progress-bar" id="overall-progress" role="progressbar" style="width: 0%; background: var(--success-gradient); border-radius: 4px; transition: width 0.5s ease;"></div>
+            </div>
+            <button class="btn btn-sm text-danger w-100 mt-3 fw-medium" onclick="app.resetProgress()" style="opacity: 0.8; font-size: 0.85rem;">
+                <i class="fas fa-redo-alt me-1"></i> Reset Progress
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="navbar-custom">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-dark p-0 d-lg-none" onclick="app.toggleSidebar(true)" style="font-size: 1.25rem;" aria-label="Open Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="m-0 fw-bold text-dark" id="page-title">Dashboard</h5>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-custom shadow-sm" onclick="app.showCheatSheet()">
+                    <i class="fas fa-book-open text-primary me-1"></i> <span class="d-none d-sm-inline">Cheat Sheet</span>
+                </button>
+                <button class="btn btn-sm btn-outline-custom shadow-sm" onclick="app.showDatabaseSchema()">
+                    <i class="fas fa-database text-primary me-1"></i> <span class="d-none d-sm-inline">Schema</span>
+                </button>
+            </div>
+        </header>
+
+        <div id="content-area" class="workspace-container"></div>
+    </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal fade" id="schemaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">Database Tables</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-white p-4">
+                <p class="text-muted small mb-4">These simulated tables are available for your queries.</p>
+                <div class="row g-3" id="schema-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cheatSheetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; background: #f8fafc;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-white">
+                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-lightbulb text-warning me-2"></i>Interview Cheat Sheet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3" id="cheat-sheet-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 bg-white pt-4 px-4">
+                <h5 class="modal-title fw-bold text-primary d-flex align-items-center gap-2">
+                    <i class="fas fa-robot"></i> AI Tutor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body markdown-body px-4" id="aiModalContent"></div>
+            <div class="modal-footer border-0 bg-white pb-4 px-4">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Got it</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const apiKey = ""; // Set at runtime
+
+/* ------------------------------------------------------------------
+   1. DATA & SCHEMA
+------------------------------------------------------------------ */
+const DB = {
+    users: [
+        { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'admin', age: 28 },
+        { id: 2, name: 'Bob Jones', email: 'bob@example.com', role: 'user', age: 34 },
+        { id: 3, name: 'Charlie Day', email: 'charlie@example.com', role: 'user', age: 22 },
+        { id: 4, name: 'Diana Prince', email: 'diana@hero.com', role: 'editor', age: 29 },
+        { id: 5, name: 'Evan Wright', email: 'evan@writer.com', role: 'user', age: 45 },
+        { id: 6, name: 'Bob Jones', email: 'bob@example.com', role: 'user', age: 34 }, 
+        { id: 7, name: 'New User', email: 'new@user.com', role: null, age: 20 }
+    ],
+    products: [
+        { id: 101, name: 'Laptop Pro', price: 1200, category: 'Electronics', stock: 50 },
+        { id: 102, name: 'Wireless Mouse', price: 25, category: 'Electronics', stock: 200 },
+        { id: 103, name: 'Coffee Mug', price: 12, category: 'Home', stock: 150 },
+        { id: 104, name: 'Office Chair', price: 150, category: 'Furniture', stock: 30 },
+        { id: 105, name: 'Headphones', price: 80, category: 'Electronics', stock: 75 }
+    ],
+    orders: [
+        { id: 501, user_id: 1, amount: 1225, date: '2023-01-15' },
+        { id: 502, user_id: 2, amount: 25, date: '2023-01-16' },
+        { id: 503, user_id: 1, amount: 80, date: '2023-02-01' },
+        { id: 504, user_id: 3, amount: 150, date: '2023-02-10' },
+        { id: 505, user_id: 2, amount: 12, date: '2023-02-15' },
+        { id: 506, user_id: 1, amount: 50, date: '2023-03-01' },
+        { id: 507, user_id: 1, amount: 60, date: '2023-03-05' },
+        { id: 508, user_id: 1, amount: 70, date: '2023-03-10' },
+        { id: 509, user_id: 1, amount: 80, date: '2023-03-15' },
+        { id: 510, user_id: 1, amount: 90, date: '2023-03-20' }
+    ],
+    employees: [
+        { id: 1, name: 'John Doe', department: 'Sales', salary: 50000 },
+        { id: 2, name: 'Jane Smith', department: 'Engineering', salary: 80000 },
+        { id: 3, name: 'Sam Brown', department: 'Sales', salary: 55000 },
+        { id: 4, name: 'Lisa White', department: 'HR', salary: 45000 },
+        { id: 5, name: 'Mike Green', department: 'Engineering', salary: 82000 },
+        { id: 6, name: 'Anna Black', department: 'Engineering', salary: 80000 }
+    ]
+};
+
+function getSchemaContext() {
+    return Object.entries(DB).map(([t, r]) => 
+        r.length ? `- Table '${t}' columns: ${Object.keys(r[0]).join(', ')}` : ''
+    ).join('\n');
+}
+
+/* ------------------------------------------------------------------
+   2. SQL ENGINE
+------------------------------------------------------------------ */
+const SQLEngine = {
+    splitColumns: function(str) {
+        const result = [];
+        let current = '';
+        let depth = 0;
+        for (let char of str) {
+            if (char === '(') depth++;
+            if (char === ')') depth--;
+            if (char === ',' && depth === 0) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        if (current) result.push(current.trim());
+        return result;
+    },
+
+    execute: function(query) {
+        try {
+            const cleanQuery = query.trim().replace(/;/g, '');
+            const command = cleanQuery.split(/\s+/)[0].toUpperCase();
+            if (command === 'SELECT') return this.handleSelect(cleanQuery);
+            if (['INSERT', 'UPDATE', 'DELETE'].includes(command)) return { error: "⚠️ Sandbox: Read-only mode." };
+            return { error: `Unknown command '${command}'` };
+        } catch (e) { return { error: e.message }; }
+    },
+
+    handleSelect: function(query) {
+        const distinctMatch = query.match(/SELECT\s+(DISTINCT\s+)?(.+?)\s+FROM/i);
+        if (!distinctMatch) throw new Error("Invalid syntax. Use: SELECT ... FROM ...");
+        
+        const isDistinct = !!distinctMatch[1];
+        let colsStr = distinctMatch[2].trim();
+        
+        const fromMatch = query.match(/FROM\s+([a-zA-Z0-9_]+)/i);
+        if (!fromMatch) throw new Error("Missing FROM clause");
+        const tableName = fromMatch[1];
+        if (!DB[tableName]) throw new Error(`Table '${tableName}' not found.`);
+        
+        let results = JSON.parse(JSON.stringify(DB[tableName]));
+
+        // JOIN
+        const joinMatch = query.match(/JOIN\s+([a-zA-Z0-9_]+)\s+ON\s+(.+?)(?=\s+(?:WHERE|GROUP|ORDER|LIMIT|HAVING)|$)/i);
+        if (joinMatch) {
+            const joinTable = joinMatch[1];
+            const onCond = joinMatch[2];
+            if (!DB[joinTable]) throw new Error(`Joined table '${joinTable}' not found.`);
+            const [l, r] = onCond.split('=').map(s => s.trim());
+            const lCol = l.split('.')[1] || l;
+            const rCol = r.split('.')[1] || r;
+            
+            const joined = [];
+            results.forEach(rowA => {
+                DB[joinTable].forEach(rowB => {
+                    if (rowA[lCol] == rowB[rCol] || rowA[rCol] == rowB[lCol]) {
+                        joined.push({ ...rowA, ...rowB });
+                    }
+                });
+            });
+            results = joined;
+        }
+
+        // WHERE
+        const whereMatch = query.match(/WHERE\s+(.+?)(?=\s+(?:GROUP|ORDER|LIMIT|HAVING)|$)/i);
+        if (whereMatch) results = results.filter(row => this.evaluateWhere(row, whereMatch[1]));
+
+        // GROUP BY
+        const groupMatch = query.match(/GROUP\BY\s+(.+?)(?=\s+(?:ORDER|LIMIT|HAVING)|$)/i);
+        let grouped = [];
+        let isAgg = false;
+
+        if (groupMatch) {
+            isAgg = true;
+            const keyCol = groupMatch[1].trim();
+            const groups = {};
+            results.forEach(row => {
+                const k = row[keyCol];
+                if (!groups[k]) groups[k] = [];
+                groups[k].push(row);
+            });
+            grouped = Object.keys(groups).map(k => ({ key: k, rows: groups[k] }));
+        } else if (['COUNT', 'SUM', 'AVG', 'MAX', 'MIN'].some(op => colsStr.toUpperCase().includes(op))) {
+            isAgg = true;
+            grouped = [{ key: 'ALL', rows: results }];
+        }
+
+        // HAVING
+        const havingMatch = query.match(/HAVING\s+(.+?)(?=\s+(?:ORDER|LIMIT)|$)/i);
+        if (havingMatch && isAgg) {
+            grouped = grouped.filter(g => this.evaluateHaving(g.rows, havingMatch[1]));
+        }
+
+        // PROJECTION
+        if (isAgg) {
+            results = grouped.map(g => {
+                const rows = g.rows;
+                const ret = {};
+                const reqCols = this.splitColumns(colsStr);
+                reqCols.forEach(req => {
+                    const up = req.toUpperCase();
+                    if (up.includes('COUNT(*)')) ret['count(*)'] = rows.length;
+                    else if (up.includes('SUM')) {
+                        const col = req.match(/\((.+)\)/)[1];
+                        ret[`sum(${col})`] = rows.reduce((s, r) => s + (parseFloat(r[col])||0), 0);
+                    } else if (up.includes('AVG')) {
+                        const col = req.match(/\((.+)\)/)[1];
+                        const sum = rows.reduce((s, r) => s + (parseFloat(r[col])||0), 0);
+                        ret[`avg(${col})`] = parseFloat((sum/rows.length).toFixed(2));
+                    } else {
+                        ret[req] = rows[0][req]; // Group key
+                    }
+                });
+                return ret;
+            });
+            colsStr = "*";
+        }
+
+        // ORDER BY
+        const orderMatch = query.match(/ORDER\BY\s+(.+?)(?=\s+LIMIT|$)/i);
+        if (orderMatch) {
+            const [col, dir] = orderMatch[1].trim().split(/\s+/);
+            const isDesc = dir && dir.toUpperCase() === 'DESC';
+            results.sort((a, b) => {
+                let va = a[col] !== undefined ? a[col] : a[Object.keys(a).find(k=>k.toLowerCase()===col.toLowerCase())];
+                let vb = b[col] !== undefined ? b[col] : b[Object.keys(b).find(k=>k.toLowerCase()===col.toLowerCase())];
+                if (va < vb) return isDesc ? 1 : -1;
+                if (va > vb) return isDesc ? -1 : 1;
+                return 0;
+            });
+        }
+
+        // LIMIT/OFFSET
+        const limitMatch = query.match(/LIMIT\s+(\d+)(\s+OFFSET\s+(\d+))?/i);
+        if (limitMatch) {
+            const lim = parseInt(limitMatch[1]);
+            const off = limitMatch[3] ? parseInt(limitMatch[3]) : 0;
+            results = results.slice(off, off + lim);
+        }
+
+        // FINAL COLUMN SELECT
+        if (colsStr.trim() !== '*' && !isAgg) {
+            const reqCols = this.splitColumns(colsStr);
+            results = results.map(row => {
+                const newRow = {};
+                reqCols.forEach(col => {
+                    if (col.toUpperCase().startsWith('CASE')) {
+                        const alias = col.split(/\s+AS\s+/i)[1] || 'case_result';
+                        newRow[alias] = this.evaluateCase(row, col);
+                        return;
+                    }
+                    if (col.toUpperCase().startsWith('COALESCE')) {
+                        const matches = col.match(/COALESCE\s*\((.+?)\s*,\s*(.+?)\)/i);
+                        if(matches) {
+                            const dbCol = matches[1].trim();
+                            const fb = matches[2].trim().replace(/'/g, '');
+                            const alias = col.split(/\s+AS\s+/i)[1] || dbCol;
+                            newRow[alias] = (row[dbCol] == null) ? fb : row[dbCol];
+                            return;
+                        }
+                    }
+                    const key = col.split('.')[1] || col;
+                    if (row[key] !== undefined) newRow[key] = row[key];
+                    else if (row[col] !== undefined) newRow[col] = row[col];
+                });
+                return newRow;
+            });
+        }
+
+        // DISTINCT
+        if (isDistinct) {
+            const seen = new Set();
+            results = results.filter(r => {
+                const s = JSON.stringify(r);
+                if (seen.has(s)) return false;
+                seen.add(s);
+                return true;
+            });
+        }
+
+        return { data: results };
+    },
+
+    evaluateWhere: function(row, cond) {
+        if (cond.includes('(SELECT')) {
+            const m = cond.match(/([a-z0-9_]+)\s*(=|>|<)\s*\((SELECT.+?)\)/i);
+            if (m) {
+                const subRes = this.execute(m[3]);
+                if (subRes.data?.[0]) {
+                    const val = Object.values(subRes.data[0])[0];
+                    return eval(`${row[m[1]]} ${m[2]} ${val}`);
+                }
+            }
+        }
+        let js = cond.replace(/'/g, '"').replace(/=/g, '==').replace(/\sAND\s/gi, '&&').replace(/\sOR\s/gi, '||');
+        if (js.toUpperCase().includes(' LIKE ')) {
+            const [c, v] = js.split(/ LIKE /i).map(s=>s.trim().replace(/"/g, ''));
+            const rx = new RegExp('^'+v.replace(/%/g, '.*')+'$', 'i');
+            return rx.test(row[c]);
+        }
+        if (js.toUpperCase().includes(' IS NULL')) return row[js.split(/ IS/i)[0].trim()] == null;
+        try {
+            Object.keys(row).sort((a,b)=>b.length-a.length).forEach(k => {
+                const v = typeof row[k] === 'string' ? `"${row[k]}"` : row[k];
+                js = js.replace(new RegExp(`\\b${k}\\b`, 'g'), v);
+            });
+            return eval(js);
+        } catch { return false; }
+    },
+
+    evaluateHaving: function(rows, cond) {
+        const m = cond.match(/COUNT\(\*\)\s*(>|<|=|>=|<=)\s*(\d+)/i);
+        if (m) {
+            const op = m[1], val = parseInt(m[2]), cnt = rows.length;
+            if (op === '>') return cnt > val;
+            if (op === '==') return cnt === val; 
+        }
+        return false;
+    },
+
+    evaluateCase: function(row, str) {
+        const when = str.match(/WHEN\s+(.+?)\s+THEN\s+(.+?)(?=\s+ELSE|\s+END)/i);
+        if (when && this.evaluateWhere(row, when[1])) return when[2].replace(/'/g, '').trim();
+        const el = str.match(/ELSE\s+(.+?)\s+END/i);
+        return el ? el[1].replace(/'/g, '').trim() : null;
+    }
+};
+
+/* ------------------------------------------------------------------
+   3. CONTENT
+------------------------------------------------------------------ */
+const CURRICULUM = [
+    {
+        id: 'beginner', title: 'Level 1: Foundations',
+        lessons: [
+            { id: 'l1', title: 'What is SQL?', type: 'lesson', xp: 100,
+              content: `<h4 class="text-primary fw-bold">Welcome to SQL!</h4><p>SQL is how we talk to databases. The <code>SELECT</code> command fetches data.</p><pre>SELECT * FROM users;</pre><p>This gets <strong>all columns (*)</strong> from the <strong>users</strong> table.</p>`,
+              defaultQuery: "SELECT * FROM users", validation: r => r.length >= 5 },
+            { id: 'l2', title: 'Selecting Columns', type: 'lesson', xp: 150,
+              content: `<h4 class="text-primary fw-bold">Be Specific</h4><p>Instead of <code>*</code>, list the columns you need.</p><pre>SELECT name, email FROM users;</pre><p><strong>Task:</strong> Select <code>name</code> and <code>price</code> from <code>products</code>.</p>`,
+              defaultQuery: "SELECT name, price FROM products", validation: r => r[0].name && r[0].price && !r[0].stock },
+            { id: 'l3', title: 'Filtering (WHERE)', type: 'lesson', xp: 200,
+              content: `<h4 class="text-primary fw-bold">Filtering Data</h4><p>Use <code>WHERE</code> to find specific rows.</p><pre>SELECT * FROM products WHERE price > 50;</pre><p><strong>Task:</strong> Find <code>users</code> with role <code>'admin'</code>.</p>`,
+              defaultQuery: "SELECT * FROM users WHERE role = 'admin'", validation: r => r.length === 1 }
+        ]
+    },
+    {
+        id: 'intermediate', title: 'Level 2: Control',
+        lessons: [
+            { id: 'l4', title: 'Sorting', type: 'lesson', xp: 250,
+              content: `<h4 class="text-primary fw-bold">Ordering</h4><p>Use <code>ORDER BY</code>. Add <code>DESC</code> for descending.</p><p><strong>Task:</strong> List <code>employees</code> by <code>salary</code> (highest first).</p>`,
+              defaultQuery: "SELECT * FROM employees ORDER BY salary DESC", validation: r => r[0].salary === 82000 },
+            { id: 'l5', title: 'Pattern Matching', type: 'lesson', xp: 300,
+              content: `<h4 class="text-primary fw-bold">LIKE Operator</h4><p><code>%</code> is a wildcard.</p><pre>WHERE email LIKE '%@gmail.com'</pre><p><strong>Task:</strong> Find <code>products</code> in 'Electronics'.</p>`,
+              defaultQuery: "SELECT * FROM products WHERE category LIKE 'Electronics'", validation: r => r.length === 3 },
+            { id: 'l6', title: 'Aggregates', type: 'lesson', xp: 350,
+              content: `<h4 class="text-primary fw-bold">Math Functions</h4><p><code>COUNT</code>, <code>SUM</code>, <code>AVG</code>.</p><p><strong>Task:</strong> Average <code>salary</code> of <code>employees</code>.</p>`,
+              defaultQuery: "SELECT AVG(salary) FROM employees", validation: r => r[0]['avg(salary)'] > 0 }
+        ]
+    },
+    {
+        id: 'advanced', title: 'Level 3: Complexity',
+        lessons: [
+            { id: 'l7', title: 'GROUP BY', type: 'lesson', xp: 500,
+              content: `<h4 class="text-primary fw-bold">Grouping</h4><p>Combines rows into summaries.</p><p><strong>Task:</strong> Total <code>stock</code> per <code>category</code>.</p>`,
+              defaultQuery: "SELECT category, SUM(stock) FROM products GROUP BY category", validation: r => r.length === 3 },
+            { id: 'l8', title: 'JOINS', type: 'lesson', xp: 600,
+              content: `<h4 class="text-primary fw-bold">Joining Tables</h4><p>Connect tables by ID.</p><p><strong>Task:</strong> Join <code>orders</code> and <code>users</code>.</p>`,
+              defaultQuery: "SELECT * FROM orders JOIN users ON orders.user_id = users.id", validation: r => r.length >= 5 && r[0].email }
+        ]
+    },
+    {
+        id: 'interview', title: 'Level 4: Interview Prep',
+        lessons: [
+            { id: 'i1', title: 'Find Duplicates', type: 'lesson', xp: 800,
+              content: `<h4 class="text-primary fw-bold">Q: Find Duplicates</h4><p>Group by the column and filter groups > 1.</p><pre>SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1</pre><p><strong>Task:</strong> Find duplicate emails in <code>users</code>.</p>`,
+              defaultQuery: "SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1", validation: r => r.length > 0 && r[0]['count(*)'] > 1 },
+            { id: 'i2', title: 'Conditional Logic', type: 'lesson', xp: 900,
+              content: `<h4 class="text-primary fw-bold">CASE Statement</h4><p>Like If-Else in SQL.</p><pre>CASE WHEN salary > 80000 THEN 'High' ELSE 'Low' END</pre><p><strong>Task:</strong> Categorize employee salaries.</p>`,
+              defaultQuery: "SELECT name, salary, CASE WHEN salary >= 80000 THEN 'High' ELSE 'Low' END AS level FROM employees", validation: r => r.some(x=>x.level==='High') },
+            { id: 'i3', title: 'Nth Highest', type: 'lesson', xp: 950,
+              content: `<h4 class="text-primary fw-bold">2nd Highest Salary</h4><p>Sort descending, Skip 1, Take 1.</p><pre>LIMIT 1 OFFSET 1</pre><p><strong>Task:</strong> Find the 2nd highest salary.</p>`,
+              defaultQuery: "SELECT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1", validation: r => r[0].salary === 80000 },
+            { id: 'i4', title: 'Data Cleaning', type: 'lesson', xp: 1000,
+              content: `<h4 class="text-primary fw-bold">Cleaning Data</h4><p>1. <code>DISTINCT</code> removes duplicates.<br>2. <code>COALESCE(col, 'val')</code> fixes NULLs.</p><p><strong>Task:</strong> Select DISTINCT emails, and replace NULL roles with 'Intern' in <code>users</code>.</p>`,
+              defaultQuery: "SELECT DISTINCT email, COALESCE(role, 'Intern') AS role FROM users", validation: r => r.some(x=>x.role==='Intern') && new Set(r.map(x=>x.email)).size === r.length }
+        ]
+    }
+];
+
+const CHEAT_SHEET = [
+    { title: "Finding Duplicates", desc: "GROUP BY col HAVING COUNT(*) > 1" },
+    { title: "2nd Highest Value", desc: "ORDER BY col DESC LIMIT 1 OFFSET 1" },
+    { title: "Handle NULLs", desc: "COALESCE(col, 'Fallback Value')" },
+    { title: "Execution Order", desc: "FROM → JOIN → WHERE → GROUP → HAVING → SELECT → ORDER → LIMIT" },
+    { title: "Safe Deletes", desc: "Use CTE with ROW_NUMBER() to identify duplicates before deleting." },
+    { title: "Window Functions", desc: "ROW_NUMBER(), RANK(), DENSE_RANK() OVER (PARTITION BY ...)" }
+];
+
+/* ------------------------------------------------------------------
+   4. APP LOGIC
+------------------------------------------------------------------ */
+const app = {
+    state: { completed: [], current: null, xp: 0 },
+    lastResult: null, // For export/viz
+
+    init: function() {
+        const saved = localStorage.getItem('sqlSchoolState');
+        if (saved) this.state = JSON.parse(saved);
+        this.renderSidebar();
+        this.renderLanding();
+        this.updateStats();
+    },
+
+    toggleSidebar: function(show) {
+        const sb = document.getElementById('sidebar');
+        const bd = document.getElementById('sidebarBackdrop');
+        if(show) { sb.classList.add('active'); bd.classList.add('active'); }
+        else { sb.classList.remove('active'); bd.classList.remove('active'); }
+    },
+
+    updateStats: function() {
+        document.getElementById('total-xp').innerText = `${this.state.xp} XP`;
+        let total = 0; CURRICULUM.forEach(l => total += l.lessons.length);
+        const pct = Math.round((this.state.completed.length / total) * 100);
+        document.getElementById('overall-progress').style.width = `${pct}%`;
+        localStorage.setItem('sqlSchoolState', JSON.stringify(this.state));
+    },
+
+    resetProgress: function() {
+        if(confirm("Reset all progress?")) {
+            this.state = { completed: [], current: null, xp: 0 };
+            this.updateStats();
+            this.renderLanding();
+            this.renderSidebar();
+        }
+    },
+
+    // --- AI ---
+    async gemini(prompt) {
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const data = await res.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+        } catch { return "AI Error."; }
+    },
+
+    async magicSQL() {
+        const req = prompt("✨ Describe what you want:");
+        if(!req) return;
+        const ed = document.getElementById('sql-editor');
+        ed.style.opacity = "0.5";
+        ed.value = "-- ✨ Generating...";
+        const sql = await this.gemini(`You are a SQL expert. Schema: ${getSchemaContext()}. Request: ${req}. Output ONLY raw SQL.`);
+        ed.value = sql.replace(/```sql|```/g, '').trim();
+        ed.style.opacity = "1";
+    },
+
+    async explain() {
+        const sql = document.getElementById('sql-editor').value;
+        const box = document.getElementById('aiModalContent');
+        new bootstrap.Modal(document.getElementById('aiModal')).show();
+        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Analyzing...</div>';
+        const txt = await this.gemini(`Explain this SQL simply: ${sql}`);
+        box.innerHTML = txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    },
+
+    async generateChallenge() {
+        const box = document.getElementById('aiModalContent');
+        new bootstrap.Modal(document.getElementById('aiModal')).show();
+        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-bullseye fa-bounce fa-2x mb-3 text-primary"></i><br>Generating Challenge...</div>';
+        
+        const promptText = `Generate a single SQL practice challenge based on this schema: ${getSchemaContext()}. 
+        Return ONLY a JSON object with this format: {"title": "Title", "content": "HTML description of task", "defaultQuery": "SELECT * FROM ...", "validationSQL": "Expected result logic"}. 
+        Make it interesting but solvable with basic SQL. Do not include markdown fences in the response.`;
+        
+        try {
+            const txt = await this.gemini(promptText);
+            const jsonStr = txt.replace(/```json|```/g, '').trim();
+            let challenge;
+            try {
+                challenge = JSON.parse(jsonStr);
+            } catch(e) {
+                const match = jsonStr.match(/\{[\s\S]*\}/);
+                if(match) challenge = JSON.parse(match[0]);
+                else throw e;
+            }
+            
+            this.state.current = 'challenge';
+            this.toggleSidebar(false);
+            
+            document.getElementById('content-area').innerHTML = `
+                <div class="d-flex flex-column h-100 fade-in">
+                    <div class="lesson-instructions">
+                        <div style="max-width: 900px; margin: 0 auto;">
+                            <span class="badge bg-warning text-dark mb-2">AI Challenge</span>
+                            <h4 class="text-primary fw-bold">${challenge.title}</h4>
+                            ${challenge.content}
+                        </div>
+                    </div>
+                    <div class="editor-area bg-light flex-grow-1 row g-0">
+                        <div class="col-lg-5 p-3 d-flex flex-column">
+                            <div class="code-editor-container flex-grow-1">
+                                <div class="editor-header"><span><i class="fas fa-code me-2"></i>Editor</span></div>
+                                <textarea id="sql-editor" spellcheck="false">${challenge.defaultQuery}</textarea>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3 align-items-center">
+                                <button class="btn-run" onclick="app.runQuery('challenge')"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                            <div id="status-msg" class="status-msg"></div>
+                        </div>
+                        <div class="col-lg-7 p-3 d-flex flex-column">
+                            <div class="results-area bg-white">
+                                <div class="results-header d-flex justify-content-between">
+                                    <span>Results</span>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-custom" onclick="app.visualize()" id="viz-btn" style="display:none;"><i class="fas fa-chart-bar"></i> Viz</button>
+                                        <button class="btn btn-sm btn-outline-custom" onclick="app.exportCSV()"><i class="fas fa-download"></i> CSV</button>
+                                    </div>
+                                </div>
+                                <div id="results-out" class="flex-grow-1 overflow-auto p-0">
+                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted">Run query to view data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            bootstrap.Modal.getInstance(document.getElementById('aiModal')).hide();
+        } catch(e) { box.innerHTML = `<div class="text-danger p-4">Failed to generate challenge. Try again.</div>`; }
+    },
+
+    async fixQuery(errorMsg) {
+        const sql = document.getElementById('sql-editor').value;
+        const box = document.getElementById('aiModalContent');
+        new bootstrap.Modal(document.getElementById('aiModal')).show();
+        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-tools fa-bounce fa-2x mb-3 text-danger"></i><br>Diagnosing...</div>';
+        const txt = await this.gemini(`The user wrote: "${sql}". Error: "${errorMsg}". Schema: ${getSchemaContext()}. Explain fix and provide SQL.`);
+        box.innerHTML = txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    },
+
+    // --- VISUALIZATION & EXPORT ---
+    visualize: function() {
+        const data = this.lastResult;
+        if (!data || data.length === 0) return;
+        
+        // Find numeric column
+        const numKey = Object.keys(data[0]).find(k => typeof data[0][k] === 'number');
+        const labelKey = Object.keys(data[0]).find(k => k !== numKey) || numKey;
+        
+        if (!numKey) { alert("No numeric data to visualize!"); return; }
+        
+        const maxVal = Math.max(...data.map(d => d[numKey]));
+        const html = `
+            <div class="chart-container fade-in">
+                ${data.map(d => `
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-value">${d[numKey]}</div>
+                        <div class="chart-bar" style="height: ${(d[numKey]/maxVal)*100}%"></div>
+                        <div class="chart-label" title="${d[labelKey]}">${d[labelKey]}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        document.getElementById('results-out').innerHTML = html;
+    },
+
+    exportCSV: function() {
+        if (!this.lastResult || this.lastResult.length === 0) { alert("No results to export!"); return; }
+        const data = this.lastResult;
+        const headers = Object.keys(data[0]);
+        const csvContent = "data:text/csv;charset=utf-8," + 
+            [headers.join(","), ...data.map(row => headers.map(fieldName => JSON.stringify(row[fieldName])).join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "sql_results.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+
+    // --- RENDER ---
+    renderSidebar: function() {
+        const acc = document.getElementById('curriculumAccordion');
+        acc.innerHTML = CURRICULUM.map((lvl, i) => `
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button ${i===0?'':'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#c${i}">${lvl.title}</button></h2>
+                <div id="c${i}" class="accordion-collapse collapse ${i===0?'show':''}" data-bs-parent="#curriculumAccordion">
+                    <div class="accordion-body p-0">
+                        ${lvl.lessons.map(l => `
+                            <div class="lesson-item ${this.state.current===l.id?'active':''} ${this.state.completed.includes(l.id)?'completed':''}" onclick="app.loadLesson('${l.id}')">
+                                <span>${l.title}</span>
+                                ${this.state.completed.includes(l.id) ? '<i class="fas fa-check-circle"></i>' : '<i class="far fa-circle"></i>'}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    renderLanding: function() {
+        this.toggleSidebar(false);
+        // Updated Landing Page with Playful Elements
+        document.getElementById('content-area').innerHTML = `
+            <div class="landing-container fade-in d-flex align-items-center justify-content-center">
+                <div class="landing-blob blob-1"></div>
+                <div class="landing-blob blob-2"></div>
+                <div class="landing-blob blob-3"></div>
+                
+                <div class="code-floater" style="top: 15%; left: 10%;">SELECT</div>
+                <div class="code-floater" style="top: 25%; right: 15%; animation-delay: -2s;">*</div>
+                <div class="code-floater" style="bottom: 20%; left: 20%; animation-delay: -5s;">FROM</div>
+                <div class="code-floater" style="bottom: 30%; right: 10%; animation-delay: -7s;">WHERE</div>
+
+                <div class="hero-card">
+                    <div class="mb-4 d-inline-block p-4 rounded-circle bg-white shadow-sm">
+                        <i class="fas fa-database fa-4x text-primary"></i>
+                    </div>
+                    <h1 class="display-4 fw-bold text-dark mb-3">Unlock Data Superpowers</h1>
+                    <p class="lead text-muted mb-5">Master SQL from scratch with interactive challenges and AI assistance.</p>
+                    <button class="btn-pulse" onclick="app.loadLesson('l1')">
+                        <i class="fas fa-play"></i> Start Learning
+                    </button>
+                    <div class="mt-4 pt-3 border-top border-light d-flex justify-content-center gap-4 text-muted small">
+                        <span><i class="fas fa-check-circle text-success me-1"></i> 100% Offline</span>
+                        <span><i class="fas fa-check-circle text-success me-1"></i> Interactive</span>
+                        <span><i class="fas fa-check-circle text-success me-1"></i> AI Powered</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    loadLesson: function(id) {
+        this.state.current = id;
+        this.renderSidebar();
+        this.toggleSidebar(false);
+        
+        let content = '', defaultQuery = '';
+        if (id === 'playground') {
+            content = `<h4 class="text-primary fw-bold">Free Playground</h4><p>Experiment freely with the database. No checks, just SQL.</p>`;
+            defaultQuery = "SELECT * FROM products";
+        } else {
+            const l = CURRICULUM.flatMap(x=>x.lessons).find(x=>x.id===id);
+            if(!l) return;
+            content = l.content;
+            defaultQuery = l.defaultQuery;
+        }
+        
+        document.getElementById('content-area').innerHTML = `
+            <div class="d-flex flex-column h-100 fade-in">
+                <div class="lesson-instructions">
+                    <div style="max-width: 900px; margin: 0 auto;">${content}</div>
+                </div>
+                <div class="editor-area bg-light flex-grow-1 row g-0">
+                    <div class="col-lg-5 p-3 d-flex flex-column">
+                        <div class="code-editor-container flex-grow-1">
+                            <div class="editor-header">
+                                <span><i class="fas fa-code me-2"></i>Editor</span>
+                                <button class="btn-ai-magic" onclick="app.magicSQL()"><i class="fas fa-magic"></i> Magic</button>
+                            </div>
+                            <textarea id="sql-editor" spellcheck="false">${defaultQuery}</textarea>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3 align-items-center">
+                             <div class="d-flex gap-2">
+                                <button class="btn-run" onclick="app.runQuery('${id}')"><i class="fas fa-play"></i> Run</button>
+                                <button class="btn btn-sm btn-outline-custom" onclick="app.explain()">Explain</button>
+                             </div>
+                        </div>
+                        <div id="status-msg" class="status-msg"></div>
+                    </div>
+                    <div class="col-lg-7 p-3 d-flex flex-column">
+                        <div class="results-area bg-white">
+                            <div class="results-header d-flex justify-content-between">
+                                <span>Results</span>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-custom" onclick="app.visualize()" id="viz-btn" style="display:none;"><i class="fas fa-chart-bar"></i> Viz</button>
+                                    <button class="btn btn-sm btn-outline-custom" onclick="app.exportCSV()"><i class="fas fa-download"></i> CSV</button>
+                                </div>
+                            </div>
+                            <div id="results-out" class="flex-grow-1 overflow-auto p-0">
+                                <div class="h-100 d-flex align-items-center justify-content-center text-muted">Run query to view data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    runQuery: function(id) {
+        const sql = document.getElementById('sql-editor').value;
+        const resBox = document.getElementById('results-out');
+        const stat = document.getElementById('status-msg');
+        const editorContainer = document.querySelector('.code-editor-container');
+        const vizBtn = document.getElementById('viz-btn');
+        
+        editorContainer.classList.remove('success-glow');
+        stat.style.display = 'none';
+        vizBtn.style.display = 'none';
+        
+        const res = SQLEngine.execute(sql);
+
+        if(res.error) {
+            resBox.innerHTML = `<div class="p-5 text-center text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>${res.error}</div>`;
+            stat.className = 'status-msg status-error';
+            stat.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><strong>Error:</strong> ${res.error}</div>
+                    <button class="btn btn-sm btn-outline-danger" onclick="app.fixQuery('${res.error.replace(/'/g, "\\'")}')"><i class="fas fa-magic me-1"></i> Fix</button>
+                </div>`;
+            stat.style.display = 'block';
+            return;
+        }
+
+        this.lastResult = res.data; // Store for exports/viz
+
+        if(!res.data.length) resBox.innerHTML = `<div class="p-5 text-center text-muted">No results found.</div>`;
+        else {
+            const cols = Object.keys(res.data[0]);
+            resBox.innerHTML = `<table class="table-custom"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${res.data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+            
+            // Enable Visualization if numeric data exists
+            if (cols.some(c => typeof res.data[0][c] === 'number')) {
+                vizBtn.style.display = 'inline-block';
+            }
+        }
+
+        if(id === 'playground' || id === 'challenge') return;
+
+        const l = CURRICULUM.flatMap(x=>x.lessons).find(x=>x.id===id);
+        if(l.validation) {
+            try {
+                if(l.validation(res.data)) {
+                    stat.className = 'status-msg status-success';
+                    stat.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span><i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> +${l.xp} XP</span> <button class="btn btn-success-custom" onclick="app.complete('${id}', ${l.xp})">Next Lesson <i class="fas fa-arrow-right ms-1"></i></button></div>`;
+                    editorContainer.classList.add('success-glow');
+                } else {
+                    stat.className = 'status-msg status-error';
+                    stat.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>Result incorrect. Try again.</div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="app.fixQuery('Query executed but result is incorrect for this lesson.')"><i class="fas fa-magic me-1"></i> Fix</button>
+                        </div>`;
+                }
+                stat.style.display = 'block';
+            } catch(e) { console.error(e); }
+        }
+    },
+
+    complete: function(id, xp) {
+        if(!this.state.completed.includes(id)) {
+            this.state.completed.push(id);
+            this.state.xp += xp;
+            this.updateStats();
+        }
+        const all = CURRICULUM.flatMap(x=>x.lessons);
+        const idx = all.findIndex(x=>x.id===id);
+        if(idx < all.length-1) this.loadLesson(all[idx+1].id);
+        else this.renderLanding();
+    },
+
+    showSchema: function() {
+        document.getElementById('schema-container').innerHTML = Object.keys(DB).map(t => {
+            const r = DB[t]; if(!r.length) return '';
+            return `<div class="col-md-6"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-white fw-bold text-primary">${t}</div><div class="card-body p-0"><ul class="list-group list-group-flush small">${Object.keys(r[0]).map(k=>`<li class="list-group-item d-flex justify-content-between"><span>${k}</span><span class="text-muted">${typeof r[0][k]}</span></li>`).join('')}</ul></div></div></div>`;
+        }).join('');
+        new bootstrap.Modal(document.getElementById('schemaModal')).show();
+    },
+
+    showCheatSheet: function() {
+        document.getElementById('cheat-sheet-content').innerHTML = CHEAT_SHEET.map(c => `
+            <div class="col-md-4"><div class="cheat-card">
+                <h6 class="fw-bold text-primary mb-2">${c.title}</h6>
+                <p class="small text-muted mb-0">${c.desc}</p>
+            </div></div>
+        `).join('');
+        new bootstrap.Modal(document.getElementById('cheatSheetModal')).show();
+    }
+};
+
+app.showDatabaseSchema = app.showSchema;
+document.addEventListener('DOMContentLoaded', () => app.init());
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
