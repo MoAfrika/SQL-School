@@ -1,111 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sql School</title>
+    <title>Jackie's SQL ❤️</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
         /* --------------------------------------------------
-           CORE VARIABLES (Polished Theme)
+           THEMES (CSS Variables)
         -------------------------------------------------- */
-        :root {
-            /* Palette */
-            --primary-color: #6366f1;       /* Indigo 500 */
-            --primary-dark: #4f46e5;        /* Indigo 600 */
-            --primary-light: #818cf8;       /* Indigo 400 */
-            --primary-subtle: #e0e7ff;      /* Indigo 100 */
-            
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            
-            --accent-glow: 0 4px 20px rgba(99, 102, 241, 0.25);
-            --success-glow: 0 4px 15px rgba(16, 185, 129, 0.3);
-
+        :root[data-theme="light"] {
             --bg-main: #f8fafc;
             --bg-card: #ffffff;
-            --surface-hover: #f1f5f9;
-            
+            --bg-sidebar: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --text-light: #94a3b8;
-            
             --border-color: #e2e8f0;
-            
+            --surface-hover: #f1f5f9;
+            --editor-bg: #1e1e2e; /* Editor always dark for contrast */
+            --editor-text: #a6accd;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --shadow-subtle: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        :root[data-theme="dark"] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --surface-hover: #334155;
+            --editor-bg: #020617;
+            --editor-text: #e2e8f0;
+            --accent-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            --shadow-subtle: 0 4px 6px -1px rgba(0,0,0,0.3);
+        }
+
+        /* Core Constants */
+        :root {
+            --primary-color: #6366f1;
             --success-color: #10b981;
             --error-color: #ef4444;
-            
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            
             --font-main: 'Outfit', sans-serif;
             --font-code: 'JetBrains Mono', monospace;
-
-            --editor-bg: #1e1e2e;
-            --editor-text: #a6accd;
-            
             --sa-top: env(safe-area-inset-top);
             --sa-bottom: env(safe-area-inset-bottom);
         }
-
-        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-main);
             background-color: var(--bg-main);
             color: var(--text-main);
-            height: 100vh;
             height: 100dvh;
             overflow: hidden;
             margin: 0;
-            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* --------------------------------------------------
            LAYOUT
         -------------------------------------------------- */
-        .app-container { display: flex; height: 100%; position: relative; width: 100vw; }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; height: 100%; width: 100vw; position: relative; }
 
-        /* Sidebar Backdrop */
-        .sidebar-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
-            z-index: 1040; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-        .sidebar-backdrop.active { opacity: 1; pointer-events: auto; }
-
-        /* Sidebar */
         .sidebar {
-            width: 280px; background-color: var(--bg-card); border-right: 1px solid var(--border-color);
+            width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color);
             display: flex; flex-direction: column; flex-shrink: 0; 
             position: fixed; left: -280px; top: 0; height: 100%; z-index: 1050;
-            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             padding-top: var(--sa-top); padding-bottom: var(--sa-bottom);
         }
         .sidebar.active { transform: translateX(280px); }
+        .sidebar-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
+            z-index: 1040; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .sidebar-backdrop.active { opacity: 1; pointer-events: auto; }
 
         @media (min-width: 992px) {
-            .sidebar { position: relative; left: 0; transform: none; box-shadow: none; z-index: 1; }
+            .sidebar { position: relative; left: 0; transform: none; box-shadow: none; }
             .sidebar-backdrop { display: none; }
         }
 
-        .main-content { 
-            flex: 1; display: flex; flex-direction: column; 
-            background-color: var(--bg-main); width: 100%; overflow: hidden;
-        }
+        .main-content { flex: 1; display: flex; flex-direction: column; width: 100%; background: var(--bg-main); }
 
         .navbar-custom {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color); 
+            background: var(--bg-card); border-bottom: 1px solid var(--border-color);
             padding: 0.8rem 1.25rem; padding-top: calc(0.8rem + var(--sa-top));
             display: flex; justify-content: space-between; align-items: center; z-index: 100;
         }
@@ -116,237 +102,126 @@
         .brand-logo {
             font-weight: 800; font-size: 1.4rem;
             background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+            text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
 
-        /* Accordion */
-        .level-accordion .accordion-item { background: transparent; border: none; border-bottom: 1px solid var(--border-color); }
-        .level-accordion .accordion-button { background: transparent; color: var(--text-main); font-weight: 700; box-shadow: none; padding: 1.1rem; }
-        .level-accordion .accordion-button:not(.collapsed) { color: var(--primary-color); background: var(--primary-subtle); }
-
+        .level-accordion .accordion-button {
+            background: var(--bg-sidebar); color: var(--text-main); font-weight: 700;
+            box-shadow: none; border-bottom: 1px solid var(--border-color);
+        }
+        .level-accordion .accordion-button:not(.collapsed) { color: var(--primary-color); background: var(--surface-hover); }
         .lesson-item {
-            padding: 12px 15px 12px 35px; cursor: pointer; color: var(--text-muted); font-size: 0.95rem;
-            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
-            border-left: 3px solid transparent; font-weight: 500; margin: 1px 0;
+            padding: 12px 15px 12px 35px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: center; border-left: 3px solid transparent;
         }
-        .lesson-item:hover { color: var(--primary-color); background-color: var(--surface-hover); }
-        .lesson-item.active {
-            color: var(--primary-dark); background-color: rgba(99, 102, 241, 0.08);
-            border-left-color: var(--primary-color); font-weight: 600;
-        }
+        .lesson-item:hover { background: var(--surface-hover); color: var(--text-main); }
+        .lesson-item.active { border-left-color: var(--primary-color); background: var(--surface-hover); color: var(--primary-color); font-weight: 600; }
         .lesson-item.completed i { color: var(--success-color); }
 
         /* --------------------------------------------------
-           EDITOR & WORKSPACE
+           WORKSPACE
         -------------------------------------------------- */
-        .workspace-container { display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
-        @media (min-width: 992px) {
-            .workspace-container { overflow: hidden; }
-            .editor-area { flex: 1; overflow: hidden; }
-        }
-
-        .lesson-instructions {
-            background-color: #fff; border-bottom: 1px solid var(--border-color); padding: 1.5rem;
-            overflow-y: auto; flex-shrink: 0; font-size: 1rem; line-height: 1.6;
-        }
-        .lesson-instructions h4 { margin-top: 0; margin-bottom: 1rem; }
+        .workspace-container { display: flex; flex-direction: column; height: 100%; overflow-y: hidden; }
         
-        @media (max-height: 600px) { .lesson-instructions { max-height: 180px; padding: 1rem; } }
-        @media (min-width: 992px) { .lesson-instructions { max-height: 40vh; padding: 2rem; } }
+        .lesson-instructions {
+            background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 1.5rem;
+            overflow-y: auto; flex-shrink: 0; max-height: 40vh; color: var(--text-main);
+        }
+        @media (max-width: 991px) { .lesson-instructions { max-height: none; flex: 1; } }
 
-        .editor-area { display: flex; flex-direction: column; gap: 1rem; padding: 1rem; height: 100%; }
-        /* Tablet/Mobile optimization */
-        @media (max-width: 991px) { .editor-area { padding: 0.75rem; gap: 0.75rem; } }
+        .editor-area { 
+            display: flex; flex-direction: column; gap: 1rem; padding: 1rem; flex: 1; overflow-y: auto; 
+            background: var(--bg-main);
+        }
+        @media (min-width: 992px) { 
+            .editor-area { flex-direction: row; overflow: hidden; }
+            .editor-col, .results-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        }
 
         .code-editor-container {
-            background-color: var(--editor-bg); border-radius: 12px; overflow: hidden;
-            display: flex; flex-direction: column; min-height: 180px;
-            box-shadow: var(--shadow-md); border: 1px solid #334155;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background: var(--editor-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+            min-height: 200px; border: 1px solid var(--border-color); flex: 1;
         }
-        .code-editor-container:focus-within { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        .code-editor-container.success-glow {
-            border-color: var(--success-color) !important;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25) !important;
-        }
+        .code-editor-container.success-glow { border-color: var(--success-color); box-shadow: 0 0 0 2px rgba(16,185,129,0.3); }
 
-        .editor-header {
-            background-color: #161622; padding: 8px 16px; color: #7b8097; font-size: 0.75rem;
-            text-transform: uppercase; font-weight: 700; letter-spacing: 1px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 40px;
+        .editor-with-lines {
+            display: flex;
+            height: 100%;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .line-numbers {
+            background: var(--editor-bg);
+            color: var(--text-muted);
+            padding: 1rem 0.5rem;
+            text-align: right;
+            user-select: none;
+            font-family: var(--font-code);
+            font-size: 16px;
+            line-height: 1.5;
+            min-width: 2.5rem;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.5;
+            overflow: hidden; /* Hide scrollbar for lines */
         }
 
         textarea#sql-editor {
-            flex: 1; width: 100%; background: transparent; color: var(--editor-text);
-            border: none; padding: 16px; font-family: var(--font-code); font-size: 16px;
-            line-height: 1.5; resize: none; outline: none; white-space: pre; overflow-wrap: normal;
+            flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 1rem;
+            font-family: var(--font-code); font-size: 16px; resize: none; outline: none; line-height: 1.5;
+            white-space: pre; overflow-wrap: normal; overflow: auto;
         }
 
         .results-area {
-            flex: 1; background-color: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
-            min-height: 250px; box-shadow: var(--shadow-sm); position: relative;
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
+            overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 200px;
         }
+        .results-content { overflow: auto; overflow-x: auto; flex: 1; }
 
-        .results-header {
-            padding: 10px 16px; background-color: var(--surface-hover); border-bottom: 1px solid var(--border-color);
-            font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
-        /* Table Styles */
-        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; white-space: nowrap; }
+        /* Table */
+        .table-custom { width: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
         .table-custom th {
-            background-color: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase;
-            font-size: 0.75rem; letter-spacing: 0.5px; padding: 12px 16px; text-align: left;
-            position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 2;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            background: var(--surface-hover); color: var(--text-muted); font-weight: 700; padding: 12px 16px;
+            text-align: left; position: sticky; top: 0; border-bottom: 1px solid var(--border-color);
         }
-        .table-custom td { border-bottom: 1px solid var(--border-color); padding: 12px 16px; color: var(--text-main); }
+        .table-custom td { border-bottom: 1px solid var(--border-color); padding: 10px 16px; color: var(--text-main); }
         .table-custom tr:last-child td { border-bottom: none; }
-        .table-custom tr:nth-child(even) td { background-color: #fafbfc; } /* Zebra Striping */
-        .table-custom tr:hover td { background-color: #f1f5f9; }
 
         /* --------------------------------------------------
-           CHARTS
+           UTILITIES
         -------------------------------------------------- */
-        .chart-container {
-            padding: 20px; display: flex; align-items: flex-end; justify-content: space-around;
-            height: 100%; min-height: 220px; gap: 10px; width: 100%; overflow-x: auto;
-        }
-        .chart-bar-wrapper {
-            flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%;
-            justify-content: flex-end; min-width: 40px; max-width: 80px; position: relative;
-        }
-        .chart-bar {
-            width: 80%; background: var(--accent-gradient); border-radius: 6px 6px 0 0;
-            transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1); position: relative; min-height: 4px;
-        }
-        .chart-bar:hover { opacity: 0.9; transform: scaleY(1.02); cursor: pointer; }
-        
-        /* Tooltip */
-        .chart-bar::after {
-            content: attr(data-val); position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;
-            opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; z-index: 10;
-        }
-        .chart-bar:hover::after { opacity: 1; }
-
-        .chart-label {
-            margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); text-align: center;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
-        }
-
-        /* --------------------------------------------------
-           LANDING PAGE (Fixed & Polished)
-        -------------------------------------------------- */
-        .landing-container {
-            position: relative; height: 100%; width: 100%; overflow: hidden;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
-        }
-        .landing-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: blobFloat 15s infinite alternate; }
-        .blob-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: #818cf8; animation-delay: 0s; }
-        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #34d399; animation-delay: -5s; }
-        .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #f472b6; animation-delay: -8s; }
-        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, -30px) scale(1.1); } }
-
-        .hero-card {
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px; padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05); max-width: 600px; width: 90%; position: relative; z-index: 2;
-            text-align: center;
-        }
-
-        /* Floating Code Particles (Fixed) */
-        .code-floater {
-            position: absolute;
-            font-family: var(--font-code);
-            color: rgba(99, 102, 241, 0.15); /* Subtle Indigo */
-            font-weight: 800;
-            font-size: 2.5rem;
-            user-select: none;
-            z-index: 1;
-            pointer-events: none;
-            animation: floatBob 8s ease-in-out infinite;
-        }
-        @keyframes floatBob {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        
-        /* Hide floaters on mobile to prevent clutter */
-        @media (max-width: 768px) { .code-floater { display: none; } }
-
-        /* Pulse Button */
-        .btn-pulse {
-            background: var(--accent-gradient); color: white; border: none;
-            padding: 1rem 3rem; border-radius: 50px; font-weight: 700; font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: transform 0.2s;
-            animation: pulseBtn 2s infinite; display: inline-flex; align-items: center; gap: 10px;
-        }
-        .btn-pulse:hover { transform: scale(1.05); color: white; text-decoration: none; }
-        @keyframes pulseBtn { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
-
-        /* --------------------------------------------------
-           BUTTONS & UTILITIES
-        -------------------------------------------------- */
+        .btn-theme { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; }
         .btn-run {
-            background: var(--accent-gradient); color: white; border: none; padding: 0.6rem 1.5rem;
-            border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--accent-glow);
+            background: var(--accent-gradient); color: white; border: none; padding: 0.5rem 1.5rem;
+            border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
+            transition: transform 0.2s;
         }
-        .btn-run:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6); color: white; }
-        .btn-run:active { transform: translateY(0); }
+        .btn-run:active { transform: scale(0.95); }
+        .btn-success-custom { background: #10b981; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600; }
+        
+        .status-msg { margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 0.9rem; display: none; }
+        .status-success { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid #10b981; }
+        .status-error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid #ef4444; }
 
-        .btn-success-custom {
-            background: var(--success-gradient); color: white; border: none; padding: 0.6rem 1.5rem;
-            border-radius: 10px; font-weight: 600; font-size: 0.95rem;
-            box-shadow: var(--success-glow); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        /* Landing */
+        .landing-container { 
+            height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-main); text-align: center; padding: 2rem;
         }
-        .btn-success-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); color: white; }
-
-        .btn-ai-magic {
-            background: rgba(255,255,255,0.1); color: var(--primary-light); border: 1px solid rgba(255,255,255,0.2);
-            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-            display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        .hero-card {
+            background: var(--bg-card); padding: 3rem; border-radius: 24px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle); max-width: 600px; width: 100%;
         }
-        .btn-ai-magic:hover { background: rgba(255,255,255,0.2); color: white; transform: translateY(-1px); }
-
-        .btn-outline-custom {
-            border: 1px solid var(--border-color); color: var(--text-muted); background: white;
-            border-radius: 10px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        .floating-blob {
+            position: absolute; width: 300px; height: 300px; background: var(--primary-color);
+            filter: blur(80px); opacity: 0.15; border-radius: 50%; z-index: 0; animation: float 10s infinite alternate;
         }
-        .btn-outline-custom:hover { border-color: var(--primary-color); color: var(--primary-color); background: var(--surface-hover); }
-
-        .badge-xp {
-            background: var(--success-gradient); color: white; padding: 0.35rem 0.85rem;
-            border-radius: 20px; font-weight: 700; font-size: 0.8rem; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-        }
-
-        .status-msg {
-            padding: 16px; border-radius: 12px; margin-top: 16px; display: none; font-size: 0.95rem;
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: var(--shadow-sm);
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .status-success { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; }
-        .status-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-
-        .cheat-card {
-            border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: white;
-            height: 100%; transition: transform 0.2s; display: flex; flex-direction: column; justify-content: center;
-        }
-        .cheat-card:hover { transform: translateY(-3px); border-color: var(--primary-light); box-shadow: var(--shadow-md); }
+        @keyframes float { from { transform: translate(0,0); } to { transform: translate(20px, -20px); } }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Helper for hiding text on small screens */
-        @media (max-width: 576px) { .btn-text-responsive { display: none; } }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -357,58 +232,37 @@
     <nav class="sidebar" id="sidebar">
         <div class="p-4 d-flex justify-content-between align-items-center">
             <a href="#" class="brand-logo" onclick="app.renderLanding()">
-                <i class="fas fa-graduation-cap brand-icon"></i> Sql School
+                <i class="fas fa-database"></i> Jackie's SQL ❤️
             </a>
-            <button class="btn btn-sm btn-link text-muted d-lg-none p-2" onclick="app.toggleSidebar(false)" aria-label="Close Menu">
-                <i class="fas fa-times fa-lg"></i>
-            </button>
+            <button class="btn-theme d-lg-none" onclick="app.toggleSidebar(false)"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="overflow-auto flex-grow-1">
-            <div class="px-3 pb-3">
-                <button class="btn btn-outline-custom w-100 mb-2 py-2 text-start justify-content-center justify-content-md-start" onclick="app.loadLesson('playground')">
-                    <i class="fas fa-code text-warning"></i> <span>Free Playground</span>
-                </button>
-            </div>
-            <div class="accordion level-accordion" id="curriculumAccordion">
-                <!-- Populated by JS -->
-            </div>
+            <div class="accordion level-accordion" id="curriculumAccordion"></div>
         </div>
 
-        <div class="mt-auto p-4 bg-white border-top border-light">
-            <button class="btn btn-outline-custom w-100 mb-3 fw-bold py-2 justify-content-center" onclick="app.generateChallenge()" style="color: var(--primary-dark); border-color: var(--primary-subtle);">
-                <i class="fas fa-bullseye"></i> <span>AI Challenge</span>
-            </button>
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <small class="text-uppercase fw-bold text-light" style="font-size: 0.7rem; letter-spacing: 1px;">XP Progress</small>
-                <span class="badge-xp" id="total-xp">0 XP</span>
+        <div class="p-4 border-top border-secondary border-opacity-10 bg-surface">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="fw-bold text-muted">XP</small>
+                <span class="badge bg-success rounded-pill" id="total-xp">0 XP</span>
             </div>
-            <div class="progress" style="height: 8px; background-color: #f1f5f9; border-radius: 4px;">
-                <div class="progress-bar" id="overall-progress" role="progressbar" style="width: 0%; background: var(--success-gradient); border-radius: 4px; transition: width 0.5s ease;"></div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-success" id="overall-progress" style="width: 0%"></div>
             </div>
-            <button class="btn btn-sm text-danger w-100 mt-3 fw-medium" onclick="app.resetProgress()" style="opacity: 0.8; font-size: 0.85rem;">
-                <i class="fas fa-redo-alt me-1"></i> Reset Progress
-            </button>
+            <button class="btn btn-sm btn-outline-danger w-100 mt-3" onclick="app.resetProgress()">Reset</button>
         </div>
     </nav>
 
     <main class="main-content">
         <header class="navbar-custom">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-link text-dark p-0 d-lg-none" onclick="app.toggleSidebar(true)" style="font-size: 1.25rem;" aria-label="Open Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h5 class="m-0 fw-bold text-dark text-truncate" id="page-title" style="max-width: 200px;">Dashboard</h5>
+                <button class="btn-theme d-lg-none" onclick="app.toggleSidebar(true)"><i class="fas fa-bars"></i></button>
+                <h5 class="m-0 fw-bold" id="page-title">Dashboard</h5>
             </div>
-            
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-custom shadow-sm" onclick="app.showCheatSheet()" title="Cheat Sheet">
-                    <i class="fas fa-book-open text-primary"></i> <span class="btn-text-responsive">Cheat Sheet</span>
-                </button>
-                <button class="btn btn-sm btn-outline-custom shadow-sm" onclick="app.showDatabaseSchema()" title="Database Schema">
-                    <i class="fas fa-database text-primary"></i> <span class="btn-text-responsive">Schema</span>
-                </button>
+            <div class="d-flex gap-3 align-items-center">
+                <button class="btn-theme" onclick="app.toggleTheme()" title="Toggle Theme"><i class="fas fa-moon" id="theme-icon"></i></button>
+                <button class="btn btn-sm btn-outline-primary" onclick="app.showCheatSheet()">Cheat Sheet</button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="app.showSchema()">Schema</button>
             </div>
         </header>
 
@@ -416,108 +270,45 @@
     </main>
 </div>
 
-<!-- MODALS -->
-<div class="modal fade" id="schemaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark">Database Tables</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body bg-white p-4">
-                <p class="text-muted small mb-4">Tables available in your local browser database.</p>
-                <div class="row g-3" id="schema-container"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="cheatSheetModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; background: #f8fafc;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-white">
-                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-lightbulb text-warning me-2"></i>Quick Reference</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-3" id="cheat-sheet-content"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-            <div class="modal-header border-0 bg-white pt-4 px-4">
-                <h5 class="modal-title fw-bold text-primary d-flex align-items-center gap-2">
-                    <i class="fas fa-robot"></i> AI Tutor
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4" id="aiModalContent" style="font-size: 0.95rem; line-height: 1.6;"></div>
-            <div class="modal-footer border-0 bg-white pb-4 px-4">
-                <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Got it</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Modals -->
+<div class="modal fade" id="schemaModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content" style="background:var(--bg-card); color:var(--text-main);"><div class="modal-header border-bottom border-secondary border-opacity-10"><h5 class="modal-title">Schema</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3" id="schema-container"></div></div></div></div></div>
+<div class="modal fade" id="cheatSheetModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content" style="background:var(--bg-card); color:var(--text-main);"><div class="modal-header border-bottom border-secondary border-opacity-10"><h5 class="modal-title">Interview Prep & Cheat Sheet</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3" id="cheat-sheet-content"></div></div></div></div></div>
+<div class="modal fade" id="aiModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="background:var(--bg-card); color:var(--text-main);"><div class="modal-header border-0"><h5 class="modal-title text-primary">AI Tutor</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="aiModalContent"></div></div></div></div>
 
 <script>
-const apiKey = ""; // Set at runtime
+const apiKey = "AIzaSyB5OFECsjjTXOk_gTjAizxBxWTiYh9R93w"; // Set at runtime
 
 /* ------------------------------------------------------------------
-   1. DATA & SCHEMA
+   1. DATABASE (Expanded for Advanced Lessons)
 ------------------------------------------------------------------ */
 const DB = {
-    users: [
-        { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'admin', age: 28 },
-        { id: 2, name: 'Bob Jones', email: 'bob@example.com', role: 'user', age: 34 },
-        { id: 3, name: 'Charlie Day', email: 'charlie@example.com', role: 'user', age: 22 },
-        { id: 4, name: 'Diana Prince', email: 'diana@hero.com', role: 'editor', age: 29 },
-        { id: 5, name: 'Evan Wright', email: 'evan@writer.com', role: 'user', age: 45 },
-        { id: 6, name: 'Bob Jones', email: 'bob@example.com', role: 'user', age: 34 }, 
-        { id: 7, name: 'New User', email: 'new@user.com', role: null, age: 20 }
-    ],
-    products: [
-        { id: 101, name: 'Laptop Pro', price: 1200, category: 'Electronics', stock: 50 },
-        { id: 102, name: 'Wireless Mouse', price: 25, category: 'Electronics', stock: 200 },
-        { id: 103, name: 'Coffee Mug', price: 12, category: 'Home', stock: 150 },
-        { id: 104, name: 'Office Chair', price: 150, category: 'Furniture', stock: 30 },
-        { id: 105, name: 'Headphones', price: 80, category: 'Electronics', stock: 75 }
-    ],
-    orders: [
-        { id: 501, user_id: 1, amount: 1225, date: '2023-01-15' },
-        { id: 502, user_id: 2, amount: 25, date: '2023-01-16' },
-        { id: 503, user_id: 1, amount: 80, date: '2023-02-01' },
-        { id: 504, user_id: 3, amount: 150, date: '2023-02-10' },
-        { id: 505, user_id: 2, amount: 12, date: '2023-02-15' },
-        { id: 506, user_id: 1, amount: 50, date: '2023-03-01' },
-        { id: 507, user_id: 1, amount: 60, date: '2023-03-05' },
-        { id: 508, user_id: 1, amount: 70, date: '2023-03-10' },
-        { id: 509, user_id: 1, amount: 80, date: '2023-03-15' },
-        { id: 510, user_id: 1, amount: 90, date: '2023-03-20' }
-    ],
     employees: [
-        { id: 1, name: 'John Doe', department: 'Sales', salary: 50000 },
-        { id: 2, name: 'Jane Smith', department: 'Engineering', salary: 80000 },
-        { id: 3, name: 'Sam Brown', department: 'Sales', salary: 55000 },
-        { id: 4, name: 'Lisa White', department: 'HR', salary: 45000 },
-        { id: 5, name: 'Mike Green', department: 'Engineering', salary: 82000 },
-        { id: 6, name: 'Anna Black', department: 'Engineering', salary: 80000 }
+        { id: 1, name: 'John Doe', department: 'Sales', salary: 50000, join_date: '2020-01-15' },
+        { id: 2, name: 'Jane Smith', department: 'Engineering', salary: 80000, join_date: '2019-03-23' },
+        { id: 3, name: 'Sam Brown', department: 'Sales', salary: 55000, join_date: '2021-06-01' },
+        { id: 4, name: 'Lisa White', department: 'HR', salary: 45000, join_date: '2022-01-10' },
+        { id: 5, name: 'Mike Green', department: 'Engineering', salary: 82000, join_date: '2018-11-05' },
+        { id: 6, name: 'Anna Black', department: 'Engineering', salary: 80000, join_date: '2023-02-15' }
+    ],
+    sales: [
+        { id: 101, employee_id: 1, amount: 5000, date: '2023-01-01' },
+        { id: 102, employee_id: 1, amount: 3000, date: '2023-01-02' },
+        { id: 103, employee_id: 3, amount: 7000, date: '2023-01-01' },
+        { id: 104, employee_id: 3, amount: 2000, date: '2023-01-03' }
+    ],
+    users: [
+        { id: 1, name: 'Alice', email: 'alice@test.com', role: 'admin' },
+        { id: 2, name: 'Bob', email: 'bob@test.com', role: null },
+        { id: 3, name: 'Charlie', email: 'charlie@test.com', role: 'user' },
+        { id: 4, name: 'Bob', email: 'bob@test.com', role: 'user' } // Duplicate for cleaning lesson
     ]
 };
 
-function getSchemaContext() {
-    return Object.entries(DB).map(([t, r]) => 
-        r.length ? `- Table '${t}' columns: ${Object.keys(r[0]).join(', ')}` : ''
-    ).join('\n');
-}
-
 /* ------------------------------------------------------------------
-   2. SQL ENGINE
+   2. SQL ENGINE v3.0 (Merged & Robust)
 ------------------------------------------------------------------ */
 const SQLEngine = {
+    // Utility to split columns respecting parentheses
     splitColumns: function(str) {
         const result = [];
         let current = '';
@@ -538,29 +329,61 @@ const SQLEngine = {
 
     execute: function(query) {
         try {
-            const cleanQuery = query.trim().replace(/;/g, '');
-            const command = cleanQuery.split(/\s+/)[0].toUpperCase();
-            if (command === 'SELECT') return this.handleSelect(cleanQuery);
-            if (['INSERT', 'UPDATE', 'DELETE'].includes(command)) return { error: "⚠️ Sandbox: Read-only mode." };
-            return { error: `Unknown command '${command}'` };
+            let cleanQuery = query.trim().replace(/;/g, '');
+            // Handle CTE (WITH clause)
+            if (cleanQuery.toUpperCase().startsWith('WITH')) {
+                return this.handleCTE(cleanQuery);
+            }
+            // Standard Execution
+            return this.processQuery(cleanQuery);
         } catch (e) { return { error: e.message }; }
     },
 
-    handleSelect: function(query) {
-        const distinctMatch = query.match(/SELECT\s+(DISTINCT\s+)?(.+?)\s+FROM/i);
-        if (!distinctMatch) throw new Error("Invalid syntax. Use: SELECT ... FROM ...");
+    handleCTE: function(query) {
+        const cteMatch = query.match(/WITH\s+(\w+)\s+AS\s*\(([\s\S]+?)\)\s*(SELECT[\s\S]+)/i);
+        if (!cteMatch) throw new Error("Invalid CTE syntax. Use: WITH name AS (query) SELECT ...");
         
-        const isDistinct = !!distinctMatch[1];
-        let colsStr = distinctMatch[2].trim();
+        const cteName = cteMatch[1];
+        const cteQuery = cteMatch[2];
+        const mainQuery = cteMatch[3];
+
+        // Run CTE query
+        const cteResult = this.processQuery(cteQuery);
+        if (cteResult.error) throw new Error(`CTE Error: ${cteResult.error}`);
+
+        // Temporarily add CTE result to DB
+        const originalDB = DB[cteName]; 
+        DB[cteName] = cteResult.data;
+
+        try {
+            const result = this.processQuery(mainQuery);
+            delete DB[cteName]; // Cleanup
+            if (originalDB) DB[cteName] = originalDB; // Restore
+            return result;
+        } catch (e) {
+            delete DB[cteName];
+            throw e;
+        }
+    },
+
+    processQuery: function(query) {
+        const command = query.split(/\s+/)[0].toUpperCase();
         
+        if (['CREATE','ALTER','DROP','TRUNCATE','INSERT','UPDATE','DELETE','GRANT','REVOKE'].includes(command)) {
+            return { message: `✅ Command '${command}' executed successfully (Simulation Mode).` };
+        }
+        
+        if (command !== 'SELECT') throw new Error("Only SELECT is fully supported in this engine.");
+
+        // --- 1. FROM & JOIN ---
         const fromMatch = query.match(/FROM\s+([a-zA-Z0-9_]+)/i);
         if (!fromMatch) throw new Error("Missing FROM clause");
         const tableName = fromMatch[1];
-        if (!DB[tableName]) throw new Error(`Table '${tableName}' not found.`);
         
+        if (!DB[tableName]) throw new Error(`Table '${tableName}' not found.`);
         let results = JSON.parse(JSON.stringify(DB[tableName]));
 
-        // JOIN
+        // Handle JOINS
         const joinMatch = query.match(/JOIN\s+([a-zA-Z0-9_]+)\s+ON\s+(.+?)(?=\s+(?:WHERE|GROUP|ORDER|LIMIT|HAVING)|$)/i);
         if (joinMatch) {
             const joinTable = joinMatch[1];
@@ -573,6 +396,7 @@ const SQLEngine = {
             const joined = [];
             results.forEach(rowA => {
                 DB[joinTable].forEach(rowB => {
+                    // Simple join logic (Strings/Numbers equality)
                     if (rowA[lCol] == rowB[rCol] || rowA[rCol] == rowB[lCol]) {
                         joined.push({ ...rowA, ...rowB });
                     }
@@ -581,12 +405,17 @@ const SQLEngine = {
             results = joined;
         }
 
-        // WHERE
+        // --- 2. WHERE ---
         const whereMatch = query.match(/WHERE\s+(.+?)(?=\s+(?:GROUP|ORDER|LIMIT|HAVING)|$)/i);
-        if (whereMatch) results = results.filter(row => this.evaluateWhere(row, whereMatch[1]));
+        if (whereMatch) {
+            results = results.filter(row => this.evaluateCondition(row, whereMatch[1]));
+        }
 
-        // GROUP BY
+        // --- 3. GROUP BY & Aggregates ---
+        const distinctMatch = query.match(/SELECT\s+(DISTINCT\s+)?(.+?)\s+FROM/i);
+        let colsStr = distinctMatch[2].trim();
         const groupMatch = query.match(/GROUP\BY\s+(.+?)(?=\s+(?:ORDER|LIMIT|HAVING)|$)/i);
+        
         let grouped = [];
         let isAgg = false;
 
@@ -605,14 +434,15 @@ const SQLEngine = {
             grouped = [{ key: 'ALL', rows: results }];
         }
 
-        // HAVING
+        // --- 4. HAVING ---
         const havingMatch = query.match(/HAVING\s+(.+?)(?=\s+(?:ORDER|LIMIT)|$)/i);
         if (havingMatch && isAgg) {
             grouped = grouped.filter(g => this.evaluateHaving(g.rows, havingMatch[1]));
         }
 
-        // PROJECTION
+        // --- 5. AGGREGATE PROJECTION / WINDOW FUNCTIONS ---
         if (isAgg) {
+            // Flatten groups back to rows
             results = grouped.map(g => {
                 const rows = g.rows;
                 const ret = {};
@@ -633,10 +463,10 @@ const SQLEngine = {
                 });
                 return ret;
             });
-            colsStr = "*";
+            colsStr = "*"; // Already projected
         }
 
-        // ORDER BY
+        // --- 6. ORDER BY ---
         const orderMatch = query.match(/ORDER\BY\s+(.+?)(?=\s+LIMIT|$)/i);
         if (orderMatch) {
             const [col, dir] = orderMatch[1].trim().split(/\s+/);
@@ -644,13 +474,17 @@ const SQLEngine = {
             results.sort((a, b) => {
                 let va = a[col] !== undefined ? a[col] : a[Object.keys(a).find(k=>k.toLowerCase()===col.toLowerCase())];
                 let vb = b[col] !== undefined ? b[col] : b[Object.keys(b).find(k=>k.toLowerCase()===col.toLowerCase())];
-                if (va < vb) return isDesc ? 1 : -1;
-                if (va > vb) return isDesc ? -1 : 1;
-                return 0;
+                if(va === undefined) return 0;
+                return (va < vb ? -1 : 1) * (isDesc ? -1 : 1);
             });
         }
 
-        // LIMIT/OFFSET
+        // --- 7. Window Functions (Applied after Sort) ---
+        if (colsStr.toUpperCase().includes('OVER')) {
+            results = this.applyWindowFunctions(results, colsStr);
+        }
+
+        // --- 8. LIMIT ---
         const limitMatch = query.match(/LIMIT\s+(\d+)(\s+OFFSET\s+(\d+))?/i);
         if (limitMatch) {
             const lim = parseInt(limitMatch[1]);
@@ -658,19 +492,17 @@ const SQLEngine = {
             results = results.slice(off, off + lim);
         }
 
-        // FINAL COLUMN SELECT
+        // --- 9. FINAL PROJECTION (CASE, COALESCE, Columns) ---
         if (colsStr.trim() !== '*' && !isAgg) {
             const reqCols = this.splitColumns(colsStr);
             results = results.map(row => {
                 const newRow = {};
                 reqCols.forEach(col => {
-                    // CASE
                     if (col.toUpperCase().startsWith('CASE')) {
                         const alias = col.split(/\s+AS\s+/i)[1] || 'case_result';
                         newRow[alias] = this.evaluateCase(row, col);
                         return;
                     }
-                    // COALESCE
                     if (col.toUpperCase().startsWith('COALESCE')) {
                         const matches = col.match(/COALESCE\s*\((.+?)\s*,\s*(.+?)\)/i);
                         if(matches) {
@@ -681,7 +513,10 @@ const SQLEngine = {
                             return;
                         }
                     }
-                    const key = col.split('.')[1] || col;
+                    // Basic column selection
+                    // Handle "table.col" syntax slightly
+                    const key = col.includes('.') ? col.split('.')[1] : col;
+                    // Check if window function added it (like row_num) or existing col
                     if (row[key] !== undefined) newRow[key] = row[key];
                     else if (row[col] !== undefined) newRow[col] = row[col];
                 });
@@ -689,7 +524,8 @@ const SQLEngine = {
             });
         }
 
-        // DISTINCT
+        // --- 10. DISTINCT ---
+        const isDistinct = !!distinctMatch[1];
         if (isDistinct) {
             const seen = new Set();
             results = results.filter(r => {
@@ -703,7 +539,8 @@ const SQLEngine = {
         return { data: results };
     },
 
-    evaluateWhere: function(row, cond) {
+    // Helpers
+    evaluateCondition: function(row, cond) {
         if (cond.includes('(SELECT')) {
             const m = cond.match(/([a-z0-9_]+)\s*(=|>|<)\s*\((SELECT.+?)\)/i);
             if (m) {
@@ -714,16 +551,10 @@ const SQLEngine = {
                 }
             }
         }
-        let js = cond.replace(/'/g, '"').replace(/=/g, '==').replace(/\sAND\s/gi, '&&').replace(/\sOR\s/gi, '||');
-        if (js.toUpperCase().includes(' LIKE ')) {
-            const [c, v] = js.split(/ LIKE /i).map(s=>s.trim().replace(/"/g, ''));
-            const rx = new RegExp('^'+v.replace(/%/g, '.*')+'$', 'i');
-            return rx.test(row[c]);
-        }
-        if (js.toUpperCase().includes(' IS NULL')) return row[js.split(/ IS/i)[0].trim()] == null;
-        
+        let js = cond.replace(/=/g, '==').replace(/\sAND\s/gi, '&&').replace(/\sOR\s/gi, '||').replace(/'/g, '"');
+        if (js.toUpperCase().includes('IS NULL')) return row[js.split('IS NULL')[0].trim()] == null;
         try {
-            Object.keys(row).sort((a,b)=>b.length-a.length).forEach(k => {
+            Object.keys(row).forEach(k => {
                 const v = typeof row[k] === 'string' ? `"${row[k]}"` : row[k];
                 js = js.replace(new RegExp(`\\b${k}\\b`, 'g'), v);
             });
@@ -743,96 +574,178 @@ const SQLEngine = {
 
     evaluateCase: function(row, str) {
         const when = str.match(/WHEN\s+(.+?)\s+THEN\s+(.+?)(?=\s+ELSE|\s+END)/i);
-        if (when && this.evaluateWhere(row, when[1])) return when[2].replace(/'/g, '').trim();
+        if (when && this.evaluateCondition(row, when[1])) return when[2].replace(/'/g, '').trim();
         const el = str.match(/ELSE\s+(.+?)\s+END/i);
         return el ? el[1].replace(/'/g, '').trim() : null;
+    },
+
+    applyWindowFunctions: function(rows, selectStr) {
+        return rows.map((row, index, array) => {
+            const newRow = { ...row };
+            if (selectStr.toUpperCase().includes('ROW_NUMBER')) newRow['row_num'] = index + 1;
+            if (selectStr.toUpperCase().includes('RANK')) {
+                let rank = 1;
+                for(let i=0; i<index; i++) if (array[i].salary > array[index].salary) rank++;
+                newRow['rank'] = rank;
+            }
+            if (selectStr.toUpperCase().includes('LAG(SALARY)')) newRow['prev_salary'] = index > 0 ? array[index-1].salary : null;
+            return newRow;
+        });
     }
 };
 
 /* ------------------------------------------------------------------
-   3. CONTENT
+   3. CURRICULUM
 ------------------------------------------------------------------ */
 const CURRICULUM = [
     {
-        id: 'beginner', title: 'Level 1: Foundations',
+        title: "Level 1-5: Foundations (Refresher)",
         lessons: [
-            { id: 'l1', title: 'What is SQL?', type: 'lesson', xp: 100,
-              content: `<h4 class="text-primary fw-bold">Welcome to SQL!</h4><p>SQL is how we talk to databases. The <code>SELECT</code> command fetches data.</p><pre>SELECT * FROM users;</pre><p>This gets <strong>all columns (*)</strong> from the <strong>users</strong> table.</p>`,
-              defaultQuery: "SELECT * FROM users", validation: r => r.length >= 5 },
-            { id: 'l2', title: 'Selecting Columns', type: 'lesson', xp: 150,
-              content: `<h4 class="text-primary fw-bold">Be Specific</h4><p>Instead of <code>*</code>, list the columns you need.</p><pre>SELECT name, email FROM users;</pre><p><strong>Task:</strong> Select <code>name</code> and <code>price</code> from <code>products</code>.</p>`,
-              defaultQuery: "SELECT name, price FROM products", validation: r => r[0].name && r[0].price && !r[0].stock },
-            { id: 'l3', title: 'Filtering (WHERE)', type: 'lesson', xp: 200,
-              content: `<h4 class="text-primary fw-bold">Filtering Data</h4><p>Use <code>WHERE</code> to find specific rows.</p><pre>SELECT * FROM products WHERE price > 50;</pre><p><strong>Task:</strong> Find <code>users</code> with role <code>'admin'</code>.</p>`,
-              defaultQuery: "SELECT * FROM users WHERE role = 'admin'", validation: r => r.length === 1 }
+            { id: 'l1', title: 'SELECT *', type: 'lesson', xp: 100, 
+              content: '<h4>Your First Query</h4><p>Retrieve all columns from the users table.</p>', 
+              defaultQuery: 'SELECT * FROM users', 
+              validation: r => r.length === 4 },
+            
+            { id: 'l2', title: 'Specific Columns', type: 'lesson', xp: 150,
+              content: '<h4>Choose Columns</h4><p>Select only name and email from users.</p>',
+              defaultQuery: 'SELECT name, email FROM users',
+              validation: r => r.length > 0 && r[0].name && r[0].email && !r[0].id },
+            
+            { id: 'l3', title: 'WHERE Clause', type: 'lesson', xp: 200,
+              content: '<h4>Filtering Data</h4><p>Find all employees in the Sales department.</p>',
+              defaultQuery: "SELECT * FROM employees WHERE department = 'Sales'",
+              validation: r => r.every(x => x.department === 'Sales') },
+            
+            { id: 'l4', title: 'ORDER BY', type: 'lesson', xp: 200,
+              content: '<h4>Sorting Results</h4><p>Get employees ordered by salary (highest first).</p>',
+              defaultQuery: 'SELECT * FROM employees ORDER BY salary DESC',
+              validation: r => r[0].salary >= r[r.length-1].salary },
+            
+            { id: 'l5', title: 'Aggregate Functions', type: 'lesson', xp: 300,
+              content: '<h4>COUNT & AVG</h4><p>Find the average salary of all employees.</p><pre>SELECT AVG(salary) as avg_salary FROM employees</pre>',
+              defaultQuery: 'SELECT AVG(salary) as avg_salary FROM employees',
+              validation: r => r[0].avg_salary > 0 }
         ]
     },
     {
-        id: 'intermediate', title: 'Level 2: Control',
+        title: "Level 6: Advanced Logic",
         lessons: [
-            { id: 'l4', title: 'Sorting', type: 'lesson', xp: 250,
-              content: `<h4 class="text-primary fw-bold">Ordering</h4><p>Use <code>ORDER BY</code>. Add <code>DESC</code> for descending.</p><p><strong>Task:</strong> List <code>employees</code> by <code>salary</code> (highest first).</p>`,
-              defaultQuery: "SELECT * FROM employees ORDER BY salary DESC", validation: r => r[0].salary === 82000 },
-            { id: 'l5', title: 'Pattern Matching', type: 'lesson', xp: 300,
-              content: `<h4 class="text-primary fw-bold">LIKE Operator</h4><p><code>%</code> is a wildcard.</p><pre>WHERE email LIKE '%@gmail.com'</pre><p><strong>Task:</strong> Find <code>products</code> in 'Electronics'.</p>`,
-              defaultQuery: "SELECT * FROM products WHERE category LIKE 'Electronics'", validation: r => r.length === 3 },
-            { id: 'l6', title: 'Aggregates', type: 'lesson', xp: 350,
-              content: `<h4 class="text-primary fw-bold">Math Functions</h4><p><code>COUNT</code>, <code>SUM</code>, <code>AVG</code>.</p><p><strong>Task:</strong> Average <code>salary</code> of <code>employees</code>.</p>`,
-              defaultQuery: "SELECT AVG(salary) FROM employees", validation: r => r[0]['avg(salary)'] > 0 }
+            { id: 'l6_1', title: 'CASE Statement', type: 'lesson', xp: 500, 
+              content: `<h4>Conditional Logic</h4><p>Use <code>CASE</code> to categorize data.</p><pre>SELECT name, salary, CASE WHEN salary > 60000 THEN 'High' ELSE 'Low' END as tier FROM employees</pre>`, 
+              defaultQuery: "SELECT name, salary, CASE WHEN salary > 60000 THEN 'High' ELSE 'Low' END as tier FROM employees", validation: r => r[0].tier },
+            { id: 'l6_2', title: 'Data Cleaning', type: 'lesson', xp: 600,
+              content: `<h4>Handling NULLs</h4><p>Use <code>COALESCE</code> to fill missing values.</p><p><strong>Task:</strong> Select user names and fill null roles with 'Guest'.</p>`,
+              defaultQuery: "SELECT name, COALESCE(role, 'Guest') as role FROM users", validation: r => r.some(x => x.role === 'Guest') }
         ]
     },
     {
-        id: 'advanced', title: 'Level 3: Complexity',
+        title: "Level 7: Subqueries & CTEs",
         lessons: [
-            { id: 'l7', title: 'GROUP BY', type: 'lesson', xp: 500,
-              content: `<h4 class="text-primary fw-bold">Grouping</h4><p>Combines rows into summaries.</p><p><strong>Task:</strong> Total <code>stock</code> per <code>category</code>.</p>`,
-              defaultQuery: "SELECT category, SUM(stock) FROM products GROUP BY category", validation: r => r.length === 3 },
-            { id: 'l8', title: 'JOINS', type: 'lesson', xp: 600,
-              content: `<h4 class="text-primary fw-bold">Joining Tables</h4><p>Connect tables by ID.</p><p><strong>Task:</strong> Join <code>orders</code> and <code>users</code>.</p>`,
-              defaultQuery: "SELECT * FROM orders JOIN users ON orders.user_id = users.id", validation: r => r.length >= 5 && r[0].email }
+            { id: 'l7_1', title: 'Subqueries', type: 'lesson', xp: 700,
+              content: `<h4>Nested Queries</h4><p>Find employees who earn more than the average salary.</p><pre>SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)</pre>`,
+              defaultQuery: "SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)", validation: r => r.length > 0 },
+            { id: 'l7_2', title: 'CTEs (Common Table Expressions)', type: 'lesson', xp: 800,
+              content: `<h4>Using WITH</h4><p>CTEs make queries readable. Define a temp table first.</p><pre>WITH HighEarners AS (SELECT * FROM employees WHERE salary > 60000) SELECT * FROM HighEarners</pre>`,
+              defaultQuery: "WITH HighEarners AS (SELECT * FROM employees WHERE salary > 60000) SELECT * FROM HighEarners", validation: r => r.every(x => x.salary > 60000) }
         ]
     },
     {
-        id: 'interview', title: 'Level 4: Interview Prep',
+        title: "Level 8: Window Functions",
         lessons: [
-            { id: 'i1', title: 'Find Duplicates', type: 'lesson', xp: 800,
-              content: `<h4 class="text-primary fw-bold">Q: Find Duplicates</h4><p>Group by the column and filter groups > 1.</p><pre>SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1</pre><p><strong>Task:</strong> Find duplicate emails in <code>users</code>.</p>`,
-              defaultQuery: "SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1", validation: r => r.length > 0 && r[0]['count(*)'] > 1 },
-            { id: 'i2', title: 'Conditional Logic', type: 'lesson', xp: 900,
-              content: `<h4 class="text-primary fw-bold">CASE Statement</h4><p>Like If-Else in SQL.</p><pre>CASE WHEN salary > 80000 THEN 'High' ELSE 'Low' END</pre><p><strong>Task:</strong> Categorize employee salaries.</p>`,
-              defaultQuery: "SELECT name, salary, CASE WHEN salary >= 80000 THEN 'High' ELSE 'Low' END AS level FROM employees", validation: r => r.some(x=>x.level==='High') },
-            { id: 'i3', title: 'Nth Highest', type: 'lesson', xp: 950,
-              content: `<h4 class="text-primary fw-bold">2nd Highest Salary</h4><p>Sort descending, Skip 1, Take 1.</p><pre>LIMIT 1 OFFSET 1</pre><p><strong>Task:</strong> Find the 2nd highest salary.</p>`,
-              defaultQuery: "SELECT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1", validation: r => r[0].salary === 80000 },
-            { id: 'i4', title: 'Data Cleaning', type: 'lesson', xp: 1000,
-              content: `<h4 class="text-primary fw-bold">Cleaning Data</h4><p>1. <code>DISTINCT</code> removes duplicates.<br>2. <code>COALESCE(col, 'val')</code> fixes NULLs.</p><p><strong>Task:</strong> Select DISTINCT emails, and replace NULL roles with 'Intern' in <code>users</code>.</p>`,
-              defaultQuery: "SELECT DISTINCT email, COALESCE(role, 'Intern') AS role FROM users", validation: r => r.some(x=>x.role==='Intern') && new Set(r.map(x=>x.email)).size === r.length }
+            { id: 'l8_1', title: 'ROW_NUMBER()', type: 'lesson', xp: 900,
+              content: `<h4>Ranking Data</h4><p>Assign a unique index to rows.</p><pre>SELECT name, salary, ROW_NUMBER() OVER (ORDER BY salary DESC) as row_num FROM employees</pre>`,
+              defaultQuery: "SELECT name, salary, ROW_NUMBER() OVER (ORDER BY salary DESC) as row_num FROM employees", validation: r => r[0].row_num === 1 },
+            { id: 'l8_2', title: 'LAG & LEAD', type: 'lesson', xp: 1000,
+              content: `<h4>Time Travel</h4><p>Compare current row with previous row.</p><pre>SELECT name, salary, LAG(salary) OVER (ORDER BY salary) as prev_salary FROM employees</pre>`,
+              defaultQuery: "SELECT name, salary, LAG(salary) OVER (ORDER BY salary) as prev_salary FROM employees", validation: r => 'prev_salary' in r[0] }
+        ]
+    },
+    {
+        id: 'level5', title: 'Level 5: Database Structure (DDL)',
+        lessons: [
+            { id: 'ddl1', title: 'Command Types (Theory)', type: 'lesson', xp: 1000,
+              content: `
+                <h4 class="text-primary fw-bold">SQL Command Categories</h4>
+                <p>SQL is divided into types based on what the commands do:</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6"><div class="card p-3 border-0 bg-light"><h6 class="text-success fw-bold">1. DDL (Definition)</h6><p class="small mb-0">Defines structure (CREATE, ALTER, DROP).</p></div></div>
+                    <div class="col-md-6"><div class="card p-3 border-0 bg-light"><h6 class="text-success fw-bold">2. DML (Manipulation)</h6><p class="small mb-0">Manages data (INSERT, UPDATE, DELETE).</p></div></div>
+                    <div class="col-md-6"><div class="card p-3 border-0 bg-light"><h6 class="text-success fw-bold">3. DCL (Control)</h6><p class="small mb-0">Permissions (GRANT, REVOKE).</p></div></div>
+                </div>
+                <div class="alert alert-info border-0 shadow-sm"><strong>Note:</strong> DDL changes structure, DML changes content.</div>
+                <p>Click "Run" to complete this theory lesson.</p>
+              `,
+              defaultQuery: "SELECT 'I understand DDL and DML' AS status", validation: r => true },
+            { id: 'ddl2', title: 'CREATE Table', type: 'lesson', xp: 1100,
+              content: `
+                <h4 class="text-primary fw-bold">Creating Tables</h4>
+                <p>The <code>CREATE TABLE</code> command creates a new table in the database.</p>
+                <pre>CREATE TABLE Students (id INT, name VARCHAR(50));</pre>
+                <p><strong>Task:</strong> Run the CREATE command to create a Students table (Simulation).</p>
+              `,
+              defaultQuery: "CREATE TABLE Students (id INT, name VARCHAR(50))", validation: r => r.message !== undefined },
+            { id: 'ddl3', title: 'ALTER Table', type: 'lesson', xp: 1150,
+              content: `
+                <h4 class="text-primary fw-bold">Modifying Tables</h4>
+                <p>Use <code>ALTER TABLE</code> to add or remove columns.</p>
+                <pre>ALTER TABLE Students ADD email VARCHAR(100);</pre>
+                <p><strong>Task:</strong> Add an 'email' column to Students (Simulation).</p>
+              `,
+              defaultQuery: "ALTER TABLE Students ADD email VARCHAR(100)", validation: r => r.message !== undefined },
+            { id: 'ddl4', title: 'DROP & TRUNCATE', type: 'lesson', xp: 1200,
+              content: `
+                <h4 class="text-primary fw-bold">Deleting Structures</h4>
+                <ul><li><code>DROP TABLE</code>: Deletes the table AND data.</li><li><code>TRUNCATE TABLE</code>: Deletes data, keeps table.</li></ul>
+                <p><strong>Task:</strong> Drop the 'Students' table (Simulation).</p>
+              `,
+              defaultQuery: "DROP TABLE Students", validation: r => r.message !== undefined }
         ]
     }
 ];
 
 const CHEAT_SHEET = [
-    { title: "Finding Duplicates", desc: "GROUP BY col HAVING COUNT(*) > 1" },
-    { title: "2nd Highest Value", desc: "ORDER BY col DESC LIMIT 1 OFFSET 1" },
-    { title: "Handle NULLs", desc: "COALESCE(col, 'Fallback Value')" },
-    { title: "Execution Order", desc: "FROM → JOIN → WHERE → GROUP → HAVING → SELECT → ORDER → LIMIT" },
-    { title: "Safe Deletes", desc: "Use CTE with ROW_NUMBER() to identify duplicates before deleting." },
-    { title: "Window Functions", desc: "ROW_NUMBER(), RANK(), DENSE_RANK() OVER (PARTITION BY ...)" }
+    { title: "SQL Acronyms", desc: "DDL (Definition), DML (Manipulation), DCL (Control), TCL (Transaction)" },
+    { title: "SELECT Basics", desc: "SELECT col1, col2 FROM table → Choose specific columns<br>SELECT * FROM table → Get all columns" },
+    { title: "WHERE Filters", desc: "WHERE age > 18 AND city = 'NYC'<br>WHERE name LIKE '%John%' → Pattern matching<br>WHERE id IN (1,2,3) → Multiple values" },
+    { title: "Aggregations", desc: "COUNT(*), SUM(col), AVG(col), MAX(col), MIN(col)<br>Must use GROUP BY when mixing with regular columns" },
+    { title: "JOINs", desc: "INNER JOIN → Only matching rows<br>LEFT JOIN → All from left + matches<br>RIGHT JOIN → All from right + matches<br>FULL JOIN → All rows from both" },
+    { title: "GROUP BY", desc: "SELECT dept, COUNT(*) FROM emp GROUP BY dept<br>Groups rows sharing same value<br>Use HAVING to filter groups" },
+    { title: "ORDER BY", desc: "ORDER BY col ASC → Ascending (default)<br>ORDER BY col DESC → Descending<br>Can order by multiple columns" },
+    { title: "Window Functions", desc: "ROW_NUMBER() OVER (ORDER BY col) → Unique row numbers<br>RANK() → Rank with gaps<br>LAG(col)/LEAD(col) → Previous/next row value<br>Does NOT collapse rows like GROUP BY" },
+    { title: "CTEs", desc: "WITH temp AS (SELECT ...) SELECT * FROM temp<br>Creates readable temporary result sets<br>Can chain multiple CTEs" },
+    { title: "NULL Handling", desc: "IS NULL / IS NOT NULL → Check for null<br>COALESCE(col, 'default') → First non-null value<br>NULLIF(a, b) → Returns null if a=b" },
+    { title: "CASE Statements", desc: "CASE WHEN condition THEN value ELSE default END<br>Like if-else in SQL" },
+    { title: "Subqueries", desc: "WHERE col > (SELECT AVG(col) FROM table)<br>Can use in SELECT, WHERE, FROM clauses" },
+    { title: "DISTINCT", desc: "SELECT DISTINCT col FROM table → Remove duplicates" },
+    { title: "LIMIT/TOP", desc: "LIMIT 10 → First 10 rows (MySQL/PostgreSQL)<br>TOP 10 → First 10 rows (SQL Server)" },
+    { title: "Execution Order", desc: "FROM → ON → JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT<br>Remember: WHERE filters rows, HAVING filters groups" }
 ];
 
 /* ------------------------------------------------------------------
    4. APP LOGIC
 ------------------------------------------------------------------ */
 const app = {
-    state: { completed: [], current: null, xp: 0 },
-    lastResult: null, // For export/viz
+    state: { current: null, completed: [], xp: 0, theme: 'light' },
 
     init: function() {
-        const saved = localStorage.getItem('sqlSchoolState');
-        if (saved) this.state = JSON.parse(saved);
+        const s = JSON.parse(localStorage.getItem('sqlState')) || {};
+        this.state = { ...this.state, ...s };
+        this.applyTheme();
         this.renderSidebar();
         this.renderLanding();
-        this.updateStats();
+        this.updateXP();
+    },
+
+    toggleTheme: function() {
+        this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+        this.applyTheme();
+        this.saveState();
+    },
+
+    applyTheme: function() {
+        document.documentElement.setAttribute('data-theme', this.state.theme);
+        const icon = document.getElementById('theme-icon');
+        icon.className = this.state.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
     },
 
     toggleSidebar: function(show) {
@@ -842,191 +755,21 @@ const app = {
         else { sb.classList.remove('active'); bd.classList.remove('active'); }
     },
 
-    updateStats: function() {
-        document.getElementById('total-xp').innerText = `${this.state.xp} XP`;
-        let total = 0; CURRICULUM.forEach(l => total += l.lessons.length);
-        const pct = Math.round((this.state.completed.length / total) * 100);
-        document.getElementById('overall-progress').style.width = `${pct}%`;
-        localStorage.setItem('sqlSchoolState', JSON.stringify(this.state));
+    saveState: function() {
+        localStorage.setItem('sqlState', JSON.stringify(this.state));
     },
 
-    resetProgress: function() {
-        if(confirm("Reset all progress?")) {
-            this.state = { completed: [], current: null, xp: 0 };
-            this.updateStats();
-            this.renderLanding();
-            this.renderSidebar();
-        }
-    },
-
-    // --- AI ---
-    async gemini(prompt) {
-        try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-            const data = await res.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
-        } catch { return "AI Error."; }
-    },
-
-    async magicSQL() {
-        const req = prompt("✨ Describe what you want:");
-        if(!req) return;
-        const ed = document.getElementById('sql-editor');
-        ed.style.opacity = "0.5";
-        ed.value = "-- ✨ Generating...";
-        const sql = await this.gemini(`You are a SQL expert. Schema: ${getSchemaContext()}. Request: ${req}. Output ONLY raw SQL.`);
-        ed.value = sql.replace(/```sql|```/g, '').trim();
-        ed.style.opacity = "1";
-    },
-
-    async explain() {
-        const sql = document.getElementById('sql-editor').value;
-        const box = document.getElementById('aiModalContent');
-        new bootstrap.Modal(document.getElementById('aiModal')).show();
-        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Analyzing...</div>';
-        const txt = await this.gemini(`Explain this SQL simply: ${sql}`);
-        box.innerHTML = txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    },
-
-    async generateChallenge() {
-        const box = document.getElementById('aiModalContent');
-        new bootstrap.Modal(document.getElementById('aiModal')).show();
-        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-bullseye fa-bounce fa-2x mb-3 text-primary"></i><br>Generating Challenge...</div>';
-        
-        const promptText = `Generate a single SQL practice challenge based on this schema: ${getSchemaContext()}. 
-        Return ONLY a JSON object with this format: {"title": "Title", "content": "HTML description of task", "defaultQuery": "SELECT * FROM ...", "validationSQL": "Expected result logic"}. 
-        Make it interesting but solvable with basic SQL. Do not include markdown fences in the response.`;
-        
-        try {
-            const txt = await this.gemini(promptText);
-            const jsonStr = txt.replace(/```json|```/g, '').trim();
-            let challenge;
-            try {
-                challenge = JSON.parse(jsonStr);
-            } catch(e) {
-                const match = jsonStr.match(/\{[\s\S]*\}/);
-                if(match) challenge = JSON.parse(match[0]);
-                else throw e;
-            }
-            
-            this.state.current = 'challenge';
-            this.toggleSidebar(false);
-            
-            document.getElementById('content-area').innerHTML = `
-                <div class="d-flex flex-column h-100 fade-in">
-                    <div class="lesson-instructions">
-                        <div style="max-width: 900px; margin: 0 auto;">
-                            <span class="badge bg-warning text-dark mb-2">AI Challenge</span>
-                            <h4 class="text-primary fw-bold">${challenge.title}</h4>
-                            ${challenge.content}
-                        </div>
-                    </div>
-                    <div class="editor-area bg-light flex-grow-1 row g-0">
-                        <div class="col-lg-5 p-3 d-flex flex-column">
-                            <div class="code-editor-container flex-grow-1">
-                                <div class="editor-header"><span><i class="fas fa-code me-2"></i>Editor</span></div>
-                                <textarea id="sql-editor" spellcheck="false">${challenge.defaultQuery}</textarea>
-                            </div>
-                            <div class="d-flex justify-content-between mt-3 align-items-center">
-                                <button class="btn-run" onclick="app.runQuery('challenge')"><i class="fas fa-play"></i> Run</button>
-                            </div>
-                            <div id="status-msg" class="status-msg"></div>
-                        </div>
-                        <div class="col-lg-7 p-3 d-flex flex-column">
-                            <div class="results-area bg-white">
-                                <div class="results-header d-flex justify-content-between">
-                                    <span>Results</span>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-custom" onclick="app.visualize()" id="viz-btn" style="display:none;"><i class="fas fa-chart-bar"></i> Viz</button>
-                                        <button class="btn btn-sm btn-outline-custom" onclick="app.exportCSV()"><i class="fas fa-download"></i> CSV</button>
-                                    </div>
-                                </div>
-                                <div id="results-out" class="flex-grow-1 overflow-auto p-0">
-                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted">Run query to view data</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            bootstrap.Modal.getInstance(document.getElementById('aiModal')).hide();
-        } catch(e) { box.innerHTML = `<div class="text-danger p-4">Failed to generate challenge. Try again.</div>`; }
-    },
-
-    async fixQuery(errorMsg) {
-        const sql = document.getElementById('sql-editor').value;
-        const box = document.getElementById('aiModalContent');
-        new bootstrap.Modal(document.getElementById('aiModal')).show();
-        box.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-tools fa-bounce fa-2x mb-3 text-danger"></i><br>Diagnosing...</div>';
-        const txt = await this.gemini(`The user wrote: "${sql}". Error: "${errorMsg}". Schema: ${getSchemaContext()}. Explain fix and provide SQL.`);
-        box.innerHTML = txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    },
-
-    // --- VISUALIZATION & EXPORT ---
-    visualize: function() {
-        const data = this.lastResult;
-        if (!data || data.length === 0) return;
-        
-        // Find numeric column
-        const numKey = Object.keys(data[0]).find(k => typeof data[0][k] === 'number');
-        const labelKey = Object.keys(data[0]).find(k => k !== numKey) || numKey;
-        
-        if (!numKey) { alert("No numeric data to visualize!"); return; }
-        
-        const maxVal = Math.max(...data.map(d => d[numKey]));
-        const html = `
-            <div class="chart-container fade-in">
-                ${data.map(d => `
-                    <div class="chart-bar-wrapper">
-                        <div class="chart-value">${d[numKey]}</div>
-                        <div class="chart-bar" style="height: ${(d[numKey]/maxVal)*100}%" data-val="${d[numKey]}"></div>
-                        <div class="chart-label" title="${d[labelKey]}">${d[labelKey]}</div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        document.getElementById('results-out').innerHTML = html;
-    },
-
-    exportCSV: function() {
-        if (!this.lastResult || this.lastResult.length === 0) { alert("No results to export!"); return; }
-        const data = this.lastResult;
-        const headers = Object.keys(data[0]);
-        const csvContent = "data:text/csv;charset=utf-8," + 
-            [headers.join(","), ...data.map(row => headers.map(fieldName => JSON.stringify(row[fieldName])).join(","))].join("\n");
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "sql_results.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    },
-
-    copyCode: function() {
-        const code = document.getElementById('sql-editor').value;
-        navigator.clipboard.writeText(code);
-        const btn = document.getElementById('copy-btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        setTimeout(() => btn.innerHTML = originalText, 1500);
-    },
-
-    // --- RENDER ---
+    // --- Core Renderers ---
     renderSidebar: function() {
-        const acc = document.getElementById('curriculumAccordion');
-        acc.innerHTML = CURRICULUM.map((lvl, i) => `
-            <div class="accordion-item">
+        const container = document.getElementById('curriculumAccordion');
+        container.innerHTML = CURRICULUM.map((lvl, i) => `
+            <div class="accordion-item level-accordion">
                 <h2 class="accordion-header"><button class="accordion-button ${i===0?'':'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#c${i}">${lvl.title}</button></h2>
                 <div id="c${i}" class="accordion-collapse collapse ${i===0?'show':''}" data-bs-parent="#curriculumAccordion">
                     <div class="accordion-body p-0">
                         ${lvl.lessons.map(l => `
-                            <div class="lesson-item ${this.state.current===l.id?'active':''} ${this.state.completed.includes(l.id)?'completed':''}" onclick="app.loadLesson('${l.id}')">
-                                <span>${l.title}</span>
-                                ${this.state.completed.includes(l.id) ? '<i class="fas fa-check-circle"></i>' : '<i class="far fa-circle"></i>'}
+                            <div class="lesson-item ${this.state.completed.includes(l.id)?'completed':''} ${this.state.current===l.id?'active':''}" onclick="app.loadLesson('${l.id}')">
+                                <span>${l.title}</span> ${this.state.completed.includes(l.id)?'<i class="fas fa-check-circle"></i>':`<span class="badge bg-light text-dark">${l.xp}XP</span>`}
                             </div>
                         `).join('')}
                     </div>
@@ -1036,189 +779,198 @@ const app = {
     },
 
     renderLanding: function() {
-        this.toggleSidebar(false);
-        // Updated Landing Page with Playful Elements
         document.getElementById('content-area').innerHTML = `
-            <div class="landing-container fade-in d-flex align-items-center justify-content-center">
-                <div class="landing-blob blob-1"></div>
-                <div class="landing-blob blob-2"></div>
-                <div class="landing-blob blob-3"></div>
-                
-                <div class="code-floater" style="top: 15%; left: 10%;">SELECT</div>
-                <div class="code-floater" style="top: 25%; right: 15%; animation-delay: -2s;">*</div>
-                <div class="code-floater" style="bottom: 20%; left: 20%; animation-delay: -5s;">FROM</div>
-                <div class="code-floater" style="bottom: 30%; right: 10%; animation-delay: -7s;">WHERE</div>
-
-                <div class="hero-card">
-                    <div class="mb-4 d-inline-block p-4 rounded-circle bg-white shadow-sm">
-                        <i class="fas fa-database fa-4x text-primary"></i>
-                    </div>
-                    <h1 class="display-4 fw-bold text-dark mb-3">Unlock Data Superpowers</h1>
-                    <p class="lead text-muted mb-5">Master SQL from scratch with interactive challenges and AI assistance.</p>
-                    <button class="btn-pulse" onclick="app.loadLesson('l1')">
-                        <i class="fas fa-play"></i> Start Learning
-                    </button>
-                    <div class="mt-4 pt-3 border-top border-light d-flex justify-content-center gap-4 text-muted small">
-                        <span><i class="fas fa-check-circle text-success me-1"></i> 100% Offline</span>
-                        <span><i class="fas fa-check-circle text-success me-1"></i> Interactive</span>
-                        <span><i class="fas fa-check-circle text-success me-1"></i> AI Powered</span>
-                    </div>
+            <div class="landing-container">
+                <div class="floating-blob" style="top:-50px; left:-50px;"></div>
+                <div class="hero-card fade-in">
+                    <div class="mb-4 d-inline-block p-4 rounded-circle bg-white shadow-sm"><i class="fas fa-database fa-4x text-primary"></i></div>
+                    <h1 class="display-4 fw-bold mb-3">Jackie's SQL ❤️</h1>
+                    <p class="lead text-muted mb-4">From Beginner to Interview Ready.</p>
+                    <button class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg" onclick="app.loadLesson('l1')">Start Journey</button>
                 </div>
-            </div>
-        `;
+            </div>`;
     },
 
     loadLesson: function(id) {
+        this.toggleSidebar(false); // Fix for mobile nav issue
         this.state.current = id;
         this.renderSidebar();
-        this.toggleSidebar(false);
         
-        let content = '', defaultQuery = '';
-        if (id === 'playground') {
-            content = `<h4 class="text-primary fw-bold">Free Playground</h4><p>Experiment freely with the database. No checks, just SQL.</p>`;
-            defaultQuery = "SELECT * FROM products";
-        } else {
-            const l = CURRICULUM.flatMap(x=>x.lessons).find(x=>x.id===id);
-            if(!l) return;
-            content = l.content;
-            defaultQuery = l.defaultQuery;
-        }
-        
+        let lesson = CURRICULUM.flatMap(l=>l.lessons).find(l=>l.id===id);
+        const content = lesson ? lesson.content : "<h3>Playground</h3><p>Experiment freely.</p>";
+        const query = lesson ? lesson.defaultQuery : "SELECT * FROM employees";
+
         document.getElementById('content-area').innerHTML = `
             <div class="d-flex flex-column h-100 fade-in">
-                <div class="lesson-instructions">
-                    <div style="max-width: 900px; margin: 0 auto;">${content}</div>
-                </div>
-                <div class="editor-area bg-light flex-grow-1 row g-0">
-                    <div class="col-lg-5 p-3 d-flex flex-column">
-                        <div class="code-editor-container flex-grow-1">
-                            <div class="editor-header">
-                                <div class="d-flex align-items-center gap-2"><span><i class="fas fa-code me-2"></i>Editor</span> <button class="btn-ai-magic" onclick="app.magicSQL()"><i class="fas fa-magic"></i> Magic</button></div>
-                                <button class="btn btn-sm text-light p-0" id="copy-btn" onclick="app.copyCode()" title="Copy Code"><i class="far fa-copy"></i></button>
+                <div class="lesson-instructions">${content}</div>
+                <div class="editor-area">
+                    <div class="editor-col">
+                        <div class="code-editor-container">
+                            <div class="editor-with-lines">
+                                <div class="line-numbers" id="line-numbers">1</div>
+                                <textarea id="sql-editor" oninput="app.updateLineNumbers()">${query}</textarea>
                             </div>
-                            <textarea id="sql-editor" spellcheck="false">${defaultQuery}</textarea>
-                        </div>
-                        <div class="d-flex justify-content-between mt-3 align-items-center">
-                             <div class="d-flex gap-2">
-                                <button class="btn-run" onclick="app.runQuery('${id}')"><i class="fas fa-play"></i> Run</button>
-                                <button class="btn btn-sm btn-outline-custom" onclick="app.explain()">Explain</button>
-                             </div>
+                            <div class="p-3 border-top border-secondary border-opacity-10 bg-surface d-flex justify-content-between align-items-center">
+                                <button class="btn-run" onclick="app.run('${id}')"><i class="fas fa-play"></i> Run</button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="app.explainAI()">✨ Explain</button>
+                            </div>
                         </div>
                         <div id="status-msg" class="status-msg"></div>
                     </div>
-                    <div class="col-lg-7 p-3 d-flex flex-column">
-                        <div class="results-area bg-white">
-                            <div class="results-header d-flex justify-content-between">
-                                <span>Results</span>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-custom" onclick="app.visualize()" id="viz-btn" style="display:none;"><i class="fas fa-chart-bar"></i> Viz</button>
-                                    <button class="btn btn-sm btn-outline-custom" onclick="app.exportCSV()"><i class="fas fa-download"></i> CSV</button>
-                                </div>
-                            </div>
-                            <div id="results-out" class="flex-grow-1 overflow-auto p-0">
-                                <div class="h-100 d-flex align-items-center justify-content-center text-muted">Run query to view data</div>
-                            </div>
+                    <div class="results-col ms-lg-3 mt-3 mt-lg-0">
+                        <div class="results-area">
+                            <div class="results-header"><span>Results</span></div>
+                            <div class="results-content p-0" id="results-out"><div class="h-100 d-flex align-items-center justify-content-center text-muted">Run query...</div></div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
+        this.updateLineNumbers();
+        
+        // Scroll sync fix for line numbers
+        const ta = document.getElementById('sql-editor');
+        const ln = document.getElementById('line-numbers');
+        ta.addEventListener('scroll', () => { ln.scrollTop = ta.scrollTop; });
     },
 
-    runQuery: function(id) {
+    updateLineNumbers: function() {
+        const editor = document.getElementById('sql-editor');
+        const lineNum = document.getElementById('line-numbers');
+        if (!editor || !lineNum) return;
+        const lines = editor.value.split('\n').length;
+        lineNum.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+    },
+
+    run: function(id) {
         const sql = document.getElementById('sql-editor').value;
-        const resBox = document.getElementById('results-out');
-        const stat = document.getElementById('status-msg');
-        const editorContainer = document.querySelector('.code-editor-container');
-        const vizBtn = document.getElementById('viz-btn');
+        const msg = document.getElementById('status-msg');
+        const out = document.getElementById('results-out');
+        const editor = document.querySelector('.code-editor-container');
         
-        editorContainer.classList.remove('success-glow');
-        stat.style.display = 'none';
-        if(vizBtn) vizBtn.style.display = 'none';
-        
+        editor.classList.remove('success-glow');
+        msg.style.display = 'none';
+
         const res = SQLEngine.execute(sql);
 
         if(res.error) {
-            resBox.innerHTML = `<div class="p-5 text-center text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>${res.error}</div>`;
-            stat.className = 'status-msg status-error';
-            stat.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div><strong>Error:</strong> ${res.error}</div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="app.fixQuery('${res.error.replace(/'/g, "\\'")}')"><i class="fas fa-magic me-1"></i> Fix</button>
-                </div>`;
-            stat.style.display = 'block';
+            out.innerHTML = `<div class="p-4 text-center text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-3"></i><br>${res.error}</div>`;
             return;
         }
 
-        this.lastResult = res.data; // Store for exports/viz
-
-        if(!res.data.length) resBox.innerHTML = `<div class="p-5 text-center text-muted">No results found.</div>`;
-        else {
-            const cols = Object.keys(res.data[0]);
-            resBox.innerHTML = `<table class="table-custom"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${res.data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-            
-            // Enable Visualization if numeric data exists
-            if (cols.some(c => typeof res.data[0][c] === 'number')) {
-                vizBtn.style.display = 'inline-block';
-            }
+        if(res.message) {
+             out.innerHTML = `<div class="p-4 text-center text-success"><i class="fas fa-check-circle fa-2x mb-3"></i><br>${res.message}</div>`;
+             // Allow completing Simulation lessons
+             const l = CURRICULUM.flatMap(l=>l.lessons).find(l=>l.id===id);
+             if(l && l.validation && l.validation(res)) {
+                 this.handleSuccess(id, l, msg, editor);
+             }
+             return;
         }
 
-        if(id === 'playground' || id === 'challenge') return;
+        // Render Table
+        if(!res.data.length) {
+            out.innerHTML = `<div class="p-4 text-center text-muted">No results found.</div>`;
+        } else {
+            const cols = Object.keys(res.data[0]);
+            out.innerHTML = `<table class="table-custom"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${res.data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
 
-        const l = CURRICULUM.flatMap(x=>x.lessons).find(x=>x.id===id);
-        if(l.validation) {
+        // Validation
+        const lesson = CURRICULUM.flatMap(l=>l.lessons).find(l=>l.id===id);
+        if(lesson && lesson.validation) {
             try {
-                if(l.validation(res.data)) {
-                    stat.className = 'status-msg status-success';
-                    // Updated Success UI with Green Button
-                    stat.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span><i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> +${l.xp} XP</span> <button class="btn btn-success-custom" onclick="app.complete('${id}', ${l.xp})">Next Lesson <i class="fas fa-arrow-right ms-1"></i></button></div>`;
-                    editorContainer.classList.add('success-glow');
+                if(lesson.validation(res.data)) {
+                    this.handleSuccess(id, lesson, msg, editor);
                 } else {
-                    stat.className = 'status-msg status-error';
-                    stat.innerHTML = `
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>Result incorrect. Try again.</div>
-                            <button class="btn btn-sm btn-outline-danger" onclick="app.fixQuery('Query executed but result is incorrect for this lesson.')"><i class="fas fa-magic me-1"></i> Fix</button>
-                        </div>`;
+                    msg.className = 'status-msg status-error';
+                    msg.innerHTML = '<strong>Not quite right.</strong> Check the expected output.';
+                    msg.style.display = 'block';
                 }
-                stat.style.display = 'block';
-            } catch(e) { console.error(e); }
+            } catch(e) {}
         }
     },
 
-    complete: function(id, xp) {
+    handleSuccess: function(id, lesson, msg, editor) {
         if(!this.state.completed.includes(id)) {
             this.state.completed.push(id);
-            this.state.xp += xp;
-            this.updateStats();
+            this.state.xp += lesson.xp;
+            this.saveState();
+            this.updateXP();
+            this.renderSidebar();
         }
-        const all = CURRICULUM.flatMap(x=>x.lessons);
-        const idx = all.findIndex(x=>x.id===id);
-        if(idx < all.length-1) this.loadLesson(all[idx+1].id);
-        else this.renderLanding();
+        const tips = ['Great job!', 'Perfect!', 'Excellent!', 'Nailed it!'];
+        const tip = tips[Math.floor(Math.random() * tips.length)];
+        msg.className = 'status-msg status-success';
+        msg.innerHTML = `<strong>${tip}</strong> +${lesson.xp} XP`;
+        msg.style.display = 'block';
+        editor.classList.add('success-glow');
     },
 
-    showSchema: function() {
-        document.getElementById('schema-container').innerHTML = Object.keys(DB).map(t => {
-            const r = DB[t]; if(!r.length) return '';
-            return `<div class="col-md-6"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-white fw-bold text-primary">${t}</div><div class="card-body p-0"><ul class="list-group list-group-flush small">${Object.keys(r[0]).map(k=>`<li class="list-group-item d-flex justify-content-between"><span>${k}</span><span class="text-muted">${typeof r[0][k]}</span></li>`).join('')}</ul></div></div></div>`;
-        }).join('');
-        new bootstrap.Modal(document.getElementById('schemaModal')).show();
+    // --- Helpers ---
+    updateXP: function() {
+        document.getElementById('total-xp').innerText = `${this.state.xp} XP`;
+        let total = 0; CURRICULUM.forEach(l => total += l.lessons.length);
+        const pct = Math.round((this.state.completed.length / total) * 100);
+        document.getElementById('overall-progress').style.width = `${pct}%`;
+    },
+    
+    resetProgress: function() {
+        if(confirm("Reset all progress?")) {
+            this.state.completed = []; this.state.xp = 0;
+            this.saveState(); this.init();
+        }
     },
 
     showCheatSheet: function() {
-        document.getElementById('cheat-sheet-content').innerHTML = CHEAT_SHEET.map(c => `
-            <div class="col-md-4"><div class="cheat-card">
-                <h6 class="fw-bold text-primary mb-2">${c.title}</h6>
-                <p class="small text-muted mb-0">${c.desc}</p>
-            </div></div>
-        `).join('');
+        const c = document.getElementById('cheat-sheet-content');
+        c.innerHTML = CHEAT_SHEET.map(i => `<div class="col-md-6"><div class="p-3 border rounded h-100" style="background:var(--bg-main);"><h6 class="text-primary fw-bold">${i.title}</h6><p class="small mb-0 text-muted">${i.desc}</p></div></div>`).join('');
         new bootstrap.Modal(document.getElementById('cheatSheetModal')).show();
+    },
+
+    showSchema: function() {
+        const c = document.getElementById('schema-container');
+        c.innerHTML = Object.keys(DB).map(k => `<div class="col-md-6"><div class="p-3 border rounded" style="background:var(--bg-main);"><h6 class="text-primary fw-bold text-uppercase small">${k}</h6><div class="small text-muted">${Object.keys(DB[k][0]).join(', ')}</div></div></div>`).join('');
+        new bootstrap.Modal(document.getElementById('schemaModal')).show();
+    },
+
+    // --- AI Stub ---
+    async explainAI() {
+        const sql = document.getElementById('sql-editor').value;
+        const modal = new bootstrap.Modal(document.getElementById('aiModal'));
+        document.getElementById('aiModalContent').innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin text-primary fa-2x"></i><p class="mt-2">Analyzing...</p></div>';
+        modal.show();
+        
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Explain SQL simply: ${sql}` }] }] })
+            });
+            const data = await res.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating explanation.";
+            document.getElementById('aiModalContent').innerHTML = `<div style="line-height:1.6">${text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
+        } catch(e) {
+            document.getElementById('aiModalContent').innerText = "AI Service Unavailable (Check API Key)";
+        }
     }
 };
 
-app.showDatabaseSchema = app.showSchema;
 document.addEventListener('DOMContentLoaded', () => app.init());
+
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const lessonId = app.state.current;
+        if (lessonId) app.run(lessonId);
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        const editor = document.getElementById('sql-editor');
+        if (editor) {
+            const lines = editor.value.split('\n');
+            editor.value = lines.map(l => l.startsWith('-- ') ? l.slice(3) : '-- ' + l).join('\n');
+        }
+    }
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
